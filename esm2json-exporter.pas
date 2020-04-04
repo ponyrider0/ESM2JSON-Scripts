@@ -150,45 +150,57 @@ begin
       end
       else if (native_type = varLongWord) then
       begin
-        element_edit_value := IntToHex(native_value, 8) + 'H';
+        element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
       end
       else if (native_type = varWord) then
       begin
-        element_edit_value := IntToHex(native_value, 4) + 'H';
+        element_edit_value := '"' + IntToHex(native_value, 4) + 'H"';
       end
       else if (varByte = varLongWord) then
       begin
-        element_edit_value := IntToHex(native_value, 2) + 'H';
+        element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
       end;
 
       // Display as: "EDID" [FormID]
 //      if (Pos('FormID', element_path) <> 0) then element_edit_value := IntToHex(native_value, 8);
 
-      if (Pos('Flags', element_name) <> 0) then element_edit_value := IntToHex(native_value, 8) + 'H';
+      if (Pos('Flags', element_name) <> 0) then element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
 
       if (Pos('Value', element_name) = 1) then element_edit_value := IntToStr(native_value);
       if (Pos('Data Size', element_path) <> 0) then element_edit_value := IntToStr(native_value);
 
       if (Pos('EFID - Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
       if (Pos('Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
-      if (CompareText('ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := IntToHex(native_value, 2) + 'H';
+      if (CompareText('ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
       if (Pos('EFIT - EFIT \ Magnitude', element_path) <> 0) then element_edit_value := IntToStr(native_value);
       if (Pos('EFIT - EFIT \ Area', element_path) <> 0) then element_edit_value := IntToStr(native_value);
       if (Pos('EFIT - EFIT \ Duration', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('EFIT - EFIT \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"' + ' [' + IntToStr(native_value) + ']';
-      if (Pos('EFIT - EFIT \ Actor Value', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"' + ' [' + IntToStr(native_value) + ']';
+      if (Pos('EFIT - EFIT \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+      if (Pos('EFIT - EFIT \ Actor Value', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+
+      if (Pos('Primary Attribute', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+      if (Pos('Major Skill', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+      if (Pos('Specialization', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+      if (Pos('Teaches', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+
+      if (Pos('Skill Boost \ Skill', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+      if (Pos('Skill Boost \ Boost', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+      if (Pos('RACE \ ATTR - Base Attributes', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+      if (Pos('Body Data \ Parts \ Part \ INDX - Index', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+      if (Pos('Face Data \ Parts \ Part \ INDX - Index', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+
 
 //      AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
       AddMessage(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value + postfix2);
     end
     else
     begin
-      if (parent_type <> etSubRecordArray) then
+      if ( (parent_type <> etSubRecordArray) And (parent_type <> etArray) )then
       begin
         if (Pos('Flags', element_path) <> 0) then
         begin
-          element_edit_value := IntToHex(native_value, 8) + 'H';
-          if (Pos('ENIT - ENIT \ Flags', element_path) <> 0) then element_edit_value := IntToHex(native_value, 2) + 'H';
+          element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
+          if (Pos('ENIT - ENIT \ Flags', element_path) <> 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
           AddMessage(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value );
         end
         else
@@ -262,8 +274,8 @@ begin
   // comment this out if you don't want those messages
   AddMessage('Processing: ' + Name(e));
 
-  AddMessage('DEBUG: PathName(): ' + PathName(e));
-  AddMessage('DEBUG: FullPath(): ' + FullPath(e));
+//  AddMessage('DEBUG: PathName(): ' + PathName(e));
+//  AddMessage('DEBUG: FullPath(): ' + FullPath(e));
 
 // ==> if element_type == Container <===
   // 1. If basename starts with 'GRUP Cell ...'
@@ -283,12 +295,17 @@ begin
     begin
       parent_type := ElementType(parent);
       parent_basename := BaseName(parent);
-      AddMessage('DEBUG: Container: [' + BaseName(parent) + ']: Type:'  + IntToStr(parent_type) );
+//      AddMessage('DEBUG: Container: [' + BaseName(parent) + ']: Type:'  + IntToStr(parent_type) );
       if (parent_type = etGroupRecord) then
       begin
         // 1. If basename starts with 'GRUP Cell ...'
         parent_path := parent_basename;
-        if (Pos('GRUP Cell',parent_basename) = 1) then
+        if (Pos('GRUP Topic Children',parent_basename) = 1) then
+        begin
+          string_offset := Pos('[DIAL:', parent_basename) + 6;
+          parent_path := copy(parent_basename, string_offset, 8);
+        end
+        else if (Pos('GRUP Cell',parent_basename) = 1) then
         begin
           // 2. Then If '...Children of [' Then record CELL:<FormID>
           if (Pos('GRUP Cell Children',parent_basename) = 1) then
@@ -357,7 +374,7 @@ begin
         else if (Pos('GRUP Top ',parent_basename) = 1) then
         begin
           sig := Signature(e);
-          if ( (CompareText(sig, 'LAND')=0) Or (CompareText(sig, 'PGRD')=0) Or (IsReference(e)) ) then
+          if ( (sig = 'INFO') Or (CompareText(sig, 'LAND')=0) Or (CompareText(sig, 'PGRD')=0) Or (IsReference(e)) ) then
           begin
             parent_path := copy(parent_basename, 11, 4);
           end
