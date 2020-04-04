@@ -434,12 +434,12 @@ begin
       end;
 
 //      AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
-      json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value + postfix2);
+      json_output.append(prefix + prefix2 + type_string + '"' + element_path + '": ' + element_edit_value + postfix2);
     end
     // if child_count <> 0
     else
     begin
-      json_output.append(prefix + prefix2 + type_string + '"' + element_name + '":');
+      json_output.append(prefix + prefix2 + type_string + '"' + element_path + '":');
     end;
 
 //    if (Assigned(element_type)) then AddMessage('DEBUG: ElementType: ' + IntToStr(element_type));
