@@ -115,6 +115,38 @@ begin
 
 end;
 
+// NOTES:
+//   Path ==> hardcode for only DIAL, CELL and WRLD to have subdirs
+//   General Case:
+//     1. Filename: Morrowind_ob.esm
+//     2. Signature: 'XXXX'
+//     3. FormID: <FormID>.json
+//  DIAL:
+//     1. Filename
+//     2. Signature
+//     3. Topic FormID: <XXXX>
+//     4. INFO FormID: <XXXX>.json
+//  CELL:
+//     1. Filename
+//     2. Signature
+//     3. Block XX
+//     4. Sub-Block XX
+//     5. Cell FormID: <XXXX>
+//     6. Persistent / Temporary / VWD Children
+//     7. REF / PGRD FormID: <XXXX>.json
+//  WRLD:
+//     1. Filename
+//     2. Signature
+//     3. WRLD FormID: <XXXX>
+//   **4. Persistent CELL:
+//        5. Persistent / Temporary? / VWD Children
+//        6. REF / PGRD? FormID: <XXXX>.json
+//   **4. Block XX
+//        5. Sub-Block XX
+//        6. CELL FormID: <XXXX>
+//        7. Persistent/ Temporary / VWD Children
+//        8. REF / LAND / PGRD FormID: <XXXX>.json
+
 // called for every record selected in xEdit
 function Process(e: IInterface): integer;
 var
@@ -127,7 +159,33 @@ begin
   prefix := '    ';
 
   // comment this out if you don't want those messages
-  AddMessage('Processing: ' + FullPath(e));
+  AddMessage('Processing: ' + Name(e));
+
+  AddMessage('DEBUG: PathName(): ' + PathName(e));
+  AddMessage('DEBUG: FullPath(): ' + FullPath(e));
+
+// ==> if element_type == Container <===
+  // 1. If basename starts with 'GRUP Cell ...'
+      // 2. Then If '...Children of [' Then record CELL:<FormID>
+      // 3. Else If '...Persistent Children' Then record 'Persistent'
+      // 4. Else If '...Temporary...' Then ...
+      // 5. Else If '...Visible...' Then ...
+  // 6. Else if starts with 'GRUP Interior Cell ' ...
+  // 7. Else if starts with 'GRUP Exterior Cell ' ...
+  // 8. Else if starts with 'GRUP World Children ' ...
+  // 9. Else if starts with 'GRUP Top "' ...
+
+  element_path := '{' + Path(e) + '}';
+  parent := GetContainer(e);
+  while (Assigned(parent)) do
+    begin
+      AddMessage('DEBUG: Container: [' + BaseName(parent) + ']: Type:'  + IntToStr(ElementType(parent)) );
+
+      element_path := '{' + BaseName(parent) + '}' + element_path;
+      parent := GetContainer(parent);
+    end;
+  AddMessage('DEBUG: composed path: ' + element_path);
+
   AddMessage('');
 
   // processing code goes here
