@@ -214,13 +214,12 @@ begin
         element_edit_value := FormatNativeValue(native_value, element_edit_value);
 
         // Display as: "EDID:FormID"
-        if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('QSTI - Quest', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('AI Packages \ PKID - AI Package', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('\ SPLO - Spell', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('\ SNAM - Open sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('\ QNAM - Close sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('CNTO - Item \ Item', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ QSTI - Quest', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+//        if (Pos(' \ AI Packages \ PKID - AI Package', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+//        if (Pos(' \ SPLO - Spell', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('CONT \ SNAM - Open sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('CONT \ QNAM - Close sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+//        if (Pos(' \ CNTO - Item \ Item', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
         if (Pos('Weather Type \ Weather', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
         if (Pos('\ Door', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
         if (Pos('\ NAME - Base', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
@@ -230,7 +229,7 @@ begin
 
         if (Pos('ANAM - Enchantment Points', element_path) <> 0) then element_edit_value := IntToStr(native_value);
         if (Pos('Weather Type \ Chance', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos('CNTO - Item \ Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+//        if (Pos('\ CNTO - Item \ Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
 
         if ( (Pos('EFIT - EFIT \ Type', element_path) <> 0) And (native_type <> 8209) ) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
 
@@ -378,7 +377,6 @@ begin
 
         if ( (Pos('EFIT - EFIT \ Type', element_path) <> 0) And (native_type <> 8209) ) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
 
-        if (Pos('Flags', element_name) <> 0) then element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
         if (CompareText('CELL \ DATA - Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
 
         if (Pos('\ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
