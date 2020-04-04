@@ -114,6 +114,53 @@ begin
 end;
 
 
+function FormatNativeValue(native_value: Variant): string;
+var
+  element_edit_value: string;
+  native_type: integer;
+begin
+
+  native_type := VarType(native_value);
+
+  if (native_type = 258) then
+  begin
+    element_edit_value := StringReplace(native_value,'\','\\', [rfReplaceAll]);
+    element_edit_value := StringReplace(element_edit_value,'"','\"', [rfReplaceAll]);
+    element_edit_value := StringReplace(element_edit_value, #13#10, '\r\n', [rfReplaceAll]);
+    element_edit_value := StringReplace(element_edit_value, #10, '\n', [rfReplaceAll]);
+    element_edit_value := '"' + element_edit_value + '"'
+  end
+  else if (native_type = varDouble) then
+  begin
+    element_edit_value := FloatToStrF(native_value, 2, 15, 15);
+  end
+  else if (native_type = varBoolean) then
+  begin
+    if (native_value) then begin
+      element_edit_value := 'true';
+    end else
+    begin
+      element_edit_value := 'false';
+    end;
+  end
+  else if (native_type = varLongWord) then
+  begin
+    element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
+  end
+  else if (native_type = varWord) then
+  begin
+    element_edit_value := '"' + IntToHex(native_value, 4) + 'H"';
+  end
+  else if (varByte = varLongWord) then
+  begin
+    element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
+  end;
+
+  Result := element_edit_value;
+
+end;
+
+
 function ProcessChild(e: IInterface; prefix: string; postfix: string): integer;
 var
   element: IInterface;
