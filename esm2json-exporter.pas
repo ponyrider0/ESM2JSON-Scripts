@@ -116,7 +116,6 @@ end;
 
 function FormatNativeValue(native_value: Variant; element_edit_value: string = ''): string;
 var
-  element_edit_value: string;
   native_type: integer;
 begin
 
