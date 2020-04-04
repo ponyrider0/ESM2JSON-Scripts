@@ -167,45 +167,46 @@ begin
 //  if ( (element_type = etValue) or (element_type = etFlag) or (element_type = etSubRecord)) then
     if (child_count = 0) then
     begin
-//      if (element_type = etFlag) then element_edit_value := IntToHex(native_value, 8) + '!!!';
-//      if (VarType(native_value) = varLongWord) then element_edit_value := IntToHex(native_value, 8);
-      if (native_type = 258) then
-      begin
-        element_edit_value := StringReplace(native_value,'\','\\', [rfReplaceAll]);
-        element_edit_value := StringReplace(element_edit_value,'"','\"', [rfReplaceAll]);
-        element_edit_value := StringReplace(element_edit_value, #13#10, '\r\n', [rfReplaceAll]);
-        element_edit_value := StringReplace(element_edit_value, #10, '\n', [rfReplaceAll]);
-        element_edit_value := '"' + element_edit_value + '"'
-      end
-      else if (native_type = varDouble) then
-      begin
-        element_edit_value := FloatToStrF(native_value, 2, 15, 15);
-      end
-      else if (native_type = varBoolean) then
-      begin
-        if (native_value) then begin
-          element_edit_value := 'true';
-        end else
-        begin
-          element_edit_value := 'false';
-        end;
-      end
-      else if (native_type = varLongWord) then
-      begin
-        element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
-      end
-      else if (native_type = varWord) then
-      begin
-        element_edit_value := '"' + IntToHex(native_value, 4) + 'H"';
-      end
-      else if (varByte = varLongWord) then
-      begin
-        element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
-      end;
 
 //      AddMessage('DEBUG: element_path=' + element_path);
       if (Pos('Unused', element_path) = 0) then
       begin
+
+  //      if (element_type = etFlag) then element_edit_value := IntToHex(native_value, 8) + '!!!';
+  //      if (VarType(native_value) = varLongWord) then element_edit_value := IntToHex(native_value, 8);
+        if (native_type = 258) then
+        begin
+          element_edit_value := StringReplace(native_value,'\','\\', [rfReplaceAll]);
+          element_edit_value := StringReplace(element_edit_value,'"','\"', [rfReplaceAll]);
+          element_edit_value := StringReplace(element_edit_value, #13#10, '\r\n', [rfReplaceAll]);
+          element_edit_value := StringReplace(element_edit_value, #10, '\n', [rfReplaceAll]);
+          element_edit_value := '"' + element_edit_value + '"'
+        end
+        else if (native_type = varDouble) then
+        begin
+          element_edit_value := FloatToStrF(native_value, 2, 15, 15);
+        end
+        else if (native_type = varBoolean) then
+        begin
+          if (native_value) then begin
+            element_edit_value := 'true';
+          end else
+          begin
+            element_edit_value := 'false';
+          end;
+        end
+        else if (native_type = varLongWord) then
+        begin
+          element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
+        end
+        else if (native_type = varWord) then
+        begin
+          element_edit_value := '"' + IntToHex(native_value, 4) + 'H"';
+        end
+        else if (varByte = varLongWord) then
+        begin
+          element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
+        end;
 
         // Display as: "EDID:FormID"
         if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
