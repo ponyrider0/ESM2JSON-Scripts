@@ -68,6 +68,22 @@ begin
 end;
 
 
+function IsReference(e: IInterface): boolean;
+var
+  sig: string;
+begin
+  sig := Signature(e);
+  if ( (sig = 'ACHR') Or (sig = 'REFR') Or (sig = 'ACRE') ) then
+  begin
+    Result := True;
+  end
+  else begin
+    Result := False;
+  end;
+
+end;
+
+
 function ProcessChild(e: IInterface; prefix: string; postfix: string): integer;
 var
   element: IInterface;
@@ -234,8 +250,10 @@ end;
 function Process(e: IInterface): integer;
 var
   element, parent: IInterface;
-  element_count, element_index, child_count: integer;
+  string_offset, element_count, element_index, child_count: integer;
   element_path, element_edit_value, prefix: string;
+  sig, x_string, parent_path, parent_basename: string;
+  parent_type: TwbElementType;
 begin
   Result := 0;
 
@@ -258,13 +276,104 @@ begin
   // 8. Else if starts with 'GRUP World Children ' ...
   // 9. Else if starts with 'GRUP Top "' ...
 
-  element_path := '{' + Path(e) + '}';
+//  element_path := '{' + Path(e) + '}';
   parent := GetContainer(e);
+  element_path := IntToHex(GetLoadOrderFormID(e),8) + '.json';
   while (Assigned(parent)) do
     begin
-      AddMessage('DEBUG: Container: [' + BaseName(parent) + ']: Type:'  + IntToStr(ElementType(parent)) );
+      parent_type := ElementType(parent);
+      parent_basename := BaseName(parent);
+      AddMessage('DEBUG: Container: [' + BaseName(parent) + ']: Type:'  + IntToStr(parent_type) );
+      if (parent_type = etGroupRecord) then
+      begin
+        // 1. If basename starts with 'GRUP Cell ...'
+        parent_path := parent_basename;
+        if (Pos('GRUP Cell',parent_basename) = 1) then
+        begin
+          // 2. Then If '...Children of [' Then record CELL:<FormID>
+          if (Pos('GRUP Cell Children',parent_basename) = 1) then
+          begin
+            // Cell FORMID
+            string_offset := Pos('[CELL:', parent_basename) + 6;
+            parent_path := copy(parent_basename, string_offset, 8);
+//            parent_path := IntToHex(GetLoadOrderFormID(e),8);
+          end
+          // 3. Else If '...Persistent Children' Then record 'Persistent'
+          else if (Pos('GRUP Cell Persistent',parent_basename) = 1) then
+          begin
+            parent_path := 'Persistent';
+          end
+          // 4. Else If '...Temporary...' Then ...
+          else if (Pos('GRUP Cell Temporary',parent_basename) = 1) then
+          begin
+            parent_path := 'Temporary';
+          end
+          // 5. Else If '...Visible...' Then ...
+          else if (Pos('GRUP Cell Visible',parent_basename) = 1) then
+          begin
+            parent_path := 'Visible When Distant';
+          end;
+        end
+        // 6. Else if starts with 'GRUP Interior Cell ' ...
+        else if (Pos('GRUP Interior Cell',parent_basename) = 1) then
+        begin
+          if (Pos('GRUP Interior Cell Sub-Block',parent_basename) = 1) then
+          begin
+            string_offset := Length(parent_basename);
+            x_string := copy(parent_basename, 29, string_offset);
+            parent_path := 'Sub-Block ' + x_string;
+          end
+          else if (Pos('GRUP Interior Cell Block',parent_basename) = 1) then
+          begin
+            string_offset := Length(parent_basename);
+            x_string := copy(parent_basename, 25, string_offset);
+            parent_path := 'Block ' + x_string
+          end;
+        end
+        // 7. Else if starts with 'GRUP Exterior Cell ' ...
+        else if (Pos('GRUP Exterior Cell',parent_basename) = 1) then
+        begin
+          if (Pos('GRUP Exterior Cell Sub-Block',parent_basename) = 1) then
+          begin
+            string_offset := Length(parent_basename);
+            x_string := copy(parent_basename, 29, string_offset);
+            parent_path := 'Sub-Block ' + x_string;
+          end
+          else if (Pos('GRUP Exterior Cell Block',parent_basename) = 1) then
+          begin
+            string_offset := Length(parent_basename);
+            x_string := copy(parent_basename, 25, string_offset);
+            parent_path := 'Block ' + x_string
+          end;
+        end
+        // 8. Else if starts with 'GRUP World Children ' ...
+        else if (Pos('GRUP World Children',parent_basename) = 1) then
+        begin
+            // worldspace FORMID
+            string_offset := Pos('[WRLD:', parent_basename) + 6;
+            parent_path := copy(parent_basename, string_offset, 8);
+        end
+        // 9. Else if starts with 'GRUP Top "' ...
+        else if (Pos('GRUP Top ',parent_basename) = 1) then
+        begin
+          sig := Signature(e);
+          if ( (CompareText(sig, 'LAND')=0) Or (CompareText(sig, 'PGRD')=0) Or (IsReference(e)) ) then
+          begin
+            parent_path := copy(parent_basename, 11, 4);
+          end
+          else
+          begin
+            parent_path := sig;
+          end;
 
-      element_path := '{' + BaseName(parent) + '}' + element_path;
+        end;
+      end
+      // Not GroupRecord
+      else if (parent_type = etFile) then
+      begin
+        parent_path := parent_basename;
+      end;
+      element_path := parent_path + '\' + element_path;
       parent := GetContainer(parent);
     end;
   AddMessage('DEBUG: composed path: ' + element_path);
