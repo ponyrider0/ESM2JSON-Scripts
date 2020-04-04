@@ -326,24 +326,7 @@ begin
   prefix2 := '    ';
 
   parent_type := ElementType(e);
-  if ((parent_type = etArray) Or (parent_type = etSubRecordArray)) then
-  begin
-//    json_output.append(prefix + '[');
-    stringlist_length := json_output.Count;
-    json_output[stringlist_length-1] := json_output[stringlist_length-1] + ' [';
-  end
-  else begin
-//    json_output.append(prefix + '{');
-    stringlist_length := json_output.Count;
-    // NOTE: stringlist_length = 0 will only happen at start of file, so above no need to check above
-    if (stringlist_length = 0) then
-    begin
-      json_output.append('{');
-    end else
-    begin
-      json_output[stringlist_length-1] := json_output[stringlist_length-1] + ' {';
-    end;
-  end;
+  json_output.append(prefix + '{');
 
   element_count := ElementCount(e);
   for element_index := 0 to element_count-1 do
