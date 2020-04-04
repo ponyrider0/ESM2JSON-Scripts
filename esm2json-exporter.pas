@@ -71,47 +71,130 @@ end;
 function ProcessChild(e: IInterface; prefix: string; postfix: string): integer;
 var
   element: IInterface;
-  element_count, element_index, child_count: integer;
-  element_path, element_edit_value, prefix2, postfix2: string;
+  native_type, element_count, element_index, child_count: integer;
+  element_name, type_string, element_path, element_edit_value, prefix2, postfix2: string;
   native_value: Variant;
-  element_type: TwbElementType;
+  parent_type, element_type: TwbElementType;
 begin
-  prefix2 := prefix;
-  if (prefix = '') then prefix2 := '    ';
+  prefix2 := '    ';
 
-  AddMessage(prefix + '{');
+  parent_type := ElementType(e);
+  if ((parent_type = etArray) Or (parent_type = etSubRecordArray)) then
+  begin
+    AddMessage(prefix + '[');
+  end
+  else begin
+    AddMessage(prefix + '{');
+  end;
+
   element_count := ElementCount(e);
   for element_index := 0 to element_count-1 do
+  begin
+    postfix2 := '';
+    if (element_index <> element_count-1) then postfix2 := ',';
+
+    element := ElementByIndex(e, element_index);
+    element_name := Name(element);
+    element_path := Path(element);
+    child_count := ElementCount(element);
+    element_type := ElementType(element);
+    element_edit_value := '"' + GetEditValue(element) + '"';
+    native_value := GetNativeValue(element);
+    native_type := VarType(native_value);
+
+    type_string := '';
+    // DEBUGGING
+//  type_string := '[' + IntToStr(element_type) + ']';
+
+//  if ( (element_type = etValue) or (element_type = etFlag) or (element_type = etSubRecord)) then
+    if (child_count = 0) then
     begin
-      postfix2 := '';
-      if (element_index <> element_count-1) then postfix2 := ',';
-
-      element := ElementByIndex(e, element_index);
-      element_path := Name(element);
-      child_count := ElementCount(element);
-      element_type := ElementType(element);
-//      if ( (element_type = etValue) or (element_type = etFlag) or (element_type = etSubRecord)) then
-      if (child_count = 0) then
+//      if (element_type = etFlag) then element_edit_value := IntToHex(native_value, 8) + '!!!';
+//      if (VarType(native_value) = varLongWord) then element_edit_value := IntToHex(native_value, 8);
+      if (native_type = 258) then
+      begin
+        element_edit_value := StringReplace(native_value,'\','\\', [rfReplaceAll]);
+        element_edit_value := StringReplace(element_edit_value,'"','\"', [rfReplaceAll]);
+        element_edit_value := StringReplace(element_edit_value, #13#10, '\r\n', [rfReplaceAll]);
+        element_edit_value := StringReplace(element_edit_value, #10, '\n', [rfReplaceAll]);
+        element_edit_value := '"' + element_edit_value + '"'
+      end
+      else if (native_type = varDouble) then
+      begin
+        element_edit_value := FloatToStrF(native_value, 2, 15, 15);
+      end
+      else if (native_type = varBoolean) then
+      begin
+        if (native_value) then begin
+          element_edit_value := 'true';
+        end else
         begin
-          element_edit_value := GetEditValue(element);
-          native_value := GetNativeValue(element);
-          if (Pos(element_path, 'FormID') <> 0) then element_edit_value := IntToHex(native_value, 8);
-//          if (element_type = etFlag) then element_edit_value := IntToHex(native_value, 8) + '!!!';
-//          if (VarType(native_value) = varLongWord) then element_edit_value := IntToHex(native_value, 8);
-	        if (VarType(native_value) = 258) then element_edit_value := StringReplace(native_value,'\','\\', [rfReplaceAll]);
-//          element_edit_value := VarToStr(native_value);
-//          AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
-          AddMessage(prefix + prefix2 + '"' + element_path + '": "' + element_edit_value + '"' + postfix2);
-        end
-      else
-        begin
-          AddMessage(prefix + prefix2 + '"' + element_path + '":');
+          element_edit_value := 'false';
         end;
+      end
+      else if (native_type = varLongWord) then
+      begin
+        element_edit_value := IntToHex(native_value, 8) + 'H';
+      end
+      else if (native_type = varWord) then
+      begin
+        element_edit_value := IntToHex(native_value, 4) + 'H';
+      end
+      else if (varByte = varLongWord) then
+      begin
+        element_edit_value := IntToHex(native_value, 2) + 'H';
+      end;
 
-      if (child_count > 0) then ProcessChild(element, prefix + prefix2, postfix2);
+      // Display as: "EDID" [FormID]
+//      if (Pos('FormID', element_path) <> 0) then element_edit_value := IntToHex(native_value, 8);
 
+      if (Pos('Flags', element_name) <> 0) then element_edit_value := IntToHex(native_value, 8) + 'H';
+
+      if (Pos('Value', element_name) = 1) then element_edit_value := IntToStr(native_value);
+      if (Pos('Data Size', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+
+      if (Pos('EFID - Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+      if (Pos('Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+      if (CompareText('ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := IntToHex(native_value, 2) + 'H';
+      if (Pos('EFIT - EFIT \ Magnitude', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+      if (Pos('EFIT - EFIT \ Area', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+      if (Pos('EFIT - EFIT \ Duration', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+      if (Pos('EFIT - EFIT \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"' + ' [' + IntToStr(native_value) + ']';
+      if (Pos('EFIT - EFIT \ Actor Value', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"' + ' [' + IntToStr(native_value) + ']';
+
+//      AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
+      AddMessage(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value + postfix2);
+    end
+    else
+    begin
+      if (parent_type <> etSubRecordArray) then
+      begin
+        if (Pos('Flags', element_path) <> 0) then
+        begin
+          element_edit_value := IntToHex(native_value, 8) + 'H';
+          if (Pos('ENIT - ENIT \ Flags', element_path) <> 0) then element_edit_value := IntToHex(native_value, 2) + 'H';
+          AddMessage(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value );
+        end
+        else
+        begin
+  //        AddMessage('TEST');
+          AddMessage(prefix + prefix2 + type_string + '"' + element_name + '":');
+        end;
+      end;
     end;
-  AddMessage(prefix + '}' + postfix);
+
+//    if (Assigned(element_type)) then AddMessage('DEBUG: ElementType: ' + IntToStr(element_type));
+    if (child_count > 0) then ProcessChild(element, prefix + prefix2, postfix2);
+
+  end;
+
+  if ((parent_type = etArray) Or (parent_type = etSubRecordArray)) then
+  begin
+    AddMessage(prefix + ']' + postfix);
+  end
+  else begin
+    AddMessage(prefix + '}' + postfix);
+  end;
 
 end;
 
@@ -150,7 +233,7 @@ end;
 // called for every record selected in xEdit
 function Process(e: IInterface): integer;
 var
-  element: IInterface;
+  element, parent: IInterface;
   element_count, element_index, child_count: integer;
   element_path, element_edit_value, prefix: string;
 begin
