@@ -447,13 +447,7 @@ begin
 
   end;
 
-  if ((parent_type = etArray) Or (parent_type = etSubRecordArray)) then
-  begin
-    json_output.append(prefix + ']' + postfix);
-  end
-  else begin
-    json_output.append(prefix + '}' + postfix);
-  end;
+  json_output.append(prefix + '}' + postfix);
 
 end;
 
