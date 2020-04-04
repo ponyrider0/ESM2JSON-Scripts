@@ -203,36 +203,30 @@ begin
         element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
       end;
 
-      // Display as: "EDID:FormID"
-      if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('QSTI - Quest', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('AI Packages \ PKID - AI Package', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('\ SPLO - Spell', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('\ SNAM - Open sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('\ QNAM - Close sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('CNTO - Item \ Item', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('Weather Type \ Weather', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('\ Door', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('\ NAME - Base', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('SCRI - Script', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('ENAM - Enchantment', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('DATA - IDLE animation', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-
-      if (Pos('ANAM - Enchantment Points', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('Weather Type \ Chance', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('CNTO - Item \ Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-
-      if ( (Pos('EFIT - EFIT \ Type', element_path) <> 0) And (native_type <> 8209) ) then
-      begin
-        element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-//        element_edit_value := '"' + GetEditValue(element);
-//        AddMessage('DEBUG: native_type=' + IntToStr(native_type));
-//        element_edit_value := element_edit_value + ':' + IntToStr(native_value) + '"';
-      end;
-
 //      AddMessage('DEBUG: element_path=' + element_path);
       if (Pos('Unused', element_path) = 0) then
       begin
+
+        // Display as: "EDID:FormID"
+        if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('QSTI - Quest', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('AI Packages \ PKID - AI Package', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('\ SPLO - Spell', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('\ SNAM - Open sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('\ QNAM - Close sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('CNTO - Item \ Item', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('Weather Type \ Weather', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('\ Door', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('\ NAME - Base', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('SCRI - Script', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('ENAM - Enchantment', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('DATA - IDLE animation', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+
+        if (Pos('ANAM - Enchantment Points', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('Weather Type \ Chance', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('CNTO - Item \ Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+
+        if ( (Pos('EFIT - EFIT \ Type', element_path) <> 0) And (native_type <> 8209) ) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
 
         if (Pos('Flags', element_name) <> 0) then element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
         if (CompareText('CELL \ DATA - Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
@@ -292,6 +286,7 @@ begin
 //      AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
       json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value + postfix2);
     end
+    // if child_count <> 0
     else
     begin
       if ( (parent_type <> etSubRecordArray) And (parent_type <> etArray) )then
@@ -326,38 +321,6 @@ begin
 
 end;
 
-// NOTES:
-//   Path ==> hardcode for only DIAL, CELL and WRLD to have subdirs
-//   General Case:
-//     1. Filename: Morrowind_ob.esm
-//     2. Signature: 'XXXX'
-//     3. FormID: <FormID>.json
-//  DIAL:
-//     1. Filename
-//     2. Signature
-//     3. Topic FormID: <XXXX>
-//     4. INFO FormID: <XXXX>.json
-//  CELL:
-//     1. Filename
-//     2. Signature
-//     3. Block XX
-//     4. Sub-Block XX
-//     5. Cell FormID: <XXXX>
-//     6. Persistent / Temporary / VWD Children
-//     7. REF / PGRD FormID: <XXXX>.json
-//  WRLD:
-//     1. Filename
-//     2. Signature
-//     3. WRLD FormID: <XXXX>
-//   **4. Persistent CELL:
-//        5. Persistent / Temporary? / VWD Children
-//        6. REF / PGRD? FormID: <XXXX>.json
-//   **4. Block XX
-//        5. Sub-Block XX
-//        6. CELL FormID: <XXXX>
-//        7. Persistent/ Temporary / VWD Children
-//        8. REF / LAND / PGRD FormID: <XXXX>.json
-
 // called for every record selected in xEdit
 function Process(e: IInterface): integer;
 var
@@ -371,7 +334,6 @@ begin
 
   prefix := '    ';
 
-  // comment this out if you don't want those messages
 //  AddMessage('Processing: ' + Name(e));
 
   parent := GetContainer(e);
