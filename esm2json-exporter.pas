@@ -302,21 +302,24 @@ begin
     // if child_count <> 0
     else
     begin
-      if ( (parent_type <> etSubRecordArray) And (parent_type <> etArray) )then
-      begin
-        if (Pos('Flags', element_path) <> 0) then
-        begin
-          element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
-          if (CompareText('ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
-          if (CompareText('CELL \ DATA - Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
-          json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value );
-        end
-        else
-        begin
-  //        AddMessage('TEST');
-          json_output.append(prefix + prefix2 + type_string + '"' + element_name + '":');
-        end;
-      end;
+      json_output.append(prefix + prefix2 + type_string + '"' + element_name + '":');
+
+  //     if ( (parent_type <> etSubRecordArray) And (parent_type <> etArray) )then
+  //     begin
+  //       if (Pos('Flags', element_path) <> 0) then
+  //       begin
+  //         element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
+  //         if (CompareText('ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
+  //         if (CompareText('CELL \ DATA - Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
+  //         json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value );
+  //       end
+  //       else
+  //       begin
+  // //        AddMessage('TEST');
+  //         json_output.append(prefix + prefix2 + type_string + '"' + element_name + '":');
+  //       end;
+  //     end;
+
     end;
 
 //    if (Assigned(element_type)) then AddMessage('DEBUG: ElementType: ' + IntToStr(element_type));
