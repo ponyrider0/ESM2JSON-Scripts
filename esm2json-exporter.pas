@@ -8,6 +8,63 @@ unit esm2json_exporter;
 function Initialize: integer;
 begin
   Result := 0;
+
+  PrintElementTypes();
+  PrintVarTypes();
+
+end;
+
+
+procedure PrintVarTypes;
+begin
+  AddMessage('');
+  AddMessage('varEmpty: ' + IntToStr(varEmpty));
+  AddMessage('varNull: ' + IntToStr(varNull));
+  AddMessage('varSmallint: ' + IntToStr(varSmallint));
+  AddMessage('varInteger: ' + IntToStr(varInteger));
+  AddMessage('varSingle: ' + IntToStr(varSingle));
+  AddMessage('varDouble: ' + IntToStr(varDouble));
+  AddMessage('varCurrency: ' + IntToStr(varCurrency));
+  AddMessage('varDate: ' + IntToStr(varDate));
+  AddMessage('varOleStr: ' + IntToStr(varOleStr));
+  AddMessage('varDispatch: ' + IntToStr(varDispatch));
+  AddMessage('varError: ' + IntToStr(varError));
+  AddMessage('varBoolean: ' + IntToStr(varBoolean));
+  AddMessage('varVariant: ' + IntToStr(varVariant));
+  AddMessage('varUnknown: ' + IntToStr(varUnknown));
+  AddMessage('varShortInt: ' + IntToStr(varShortInt));
+  AddMessage('varByte: ' + IntToStr(varByte));
+  AddMessage('varWord: ' + IntToStr(varWord));
+  AddMessage('varLongWord: ' + IntToStr(varLongWord));
+  AddMessage('varInt64: ' + IntToStr(varInt64));
+  AddMessage('varStrArg: ' + IntToStr(varStrArg));
+  AddMessage('varString: ' + IntToStr(varString));
+  AddMessage('varAny: ' + IntToStr(varAny));
+  AddMessage('');
+
+end;
+
+
+procedure PrintElementTypes;
+begin
+  AddMessage('');
+  AddMessage('DEBUG: Constants:');
+  AddMessage('etFile: ' + IntToStr(etFile));
+  AddMessage('etMainRecord: ' + IntToStr(etMainRecord));
+  AddMessage('etGroupRecord: ' + IntToStr(etGroupRecord));
+  AddMessage('etSubRecord: ' + IntToStr(etSubRecord));
+  AddMessage('etSubRecordStruct: ' + IntToStr(etSubRecordStruct));
+  AddMessage('etSubRecordArray: ' + IntToStr(etSubRecordArray));
+  AddMessage('etSubRecordUnion: ' + IntToStr(etSubRecordUnion));
+  AddMessage('etArray: ' + IntToStr(etArray));
+  AddMessage('etStruct: ' + IntToStr(etStruct));
+  AddMessage('etValue: ' + IntToStr(etValue));
+  AddMessage('etFlag: ' + IntToStr(etFlag));
+  AddMessage('etStringListTerminator: ' + IntToStr(etStringListTerminator));
+  AddMessage('etUnion: ' + IntToStr(etUnion));
+  AddMessage('etStructChapter: ' + IntToStr(etStructChapter));
+  AddMessage('');
+
 end;
 
 
