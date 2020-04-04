@@ -3,14 +3,19 @@
 }
 unit esm2json_exporter;
 
+var
+  json_output: TStringList;
+  json_filecount: integer;
+
 // Called before processing
 // You can remove it if script doesn't require initialization code
 function Initialize: integer;
 begin
   Result := 0;
 
-  PrintElementTypes();
-  PrintVarTypes();
+  json_output := TStringList.Create;
+//  PrintElementTypes();
+//  PrintVarTypes();
 
 end;
 
@@ -116,16 +121,28 @@ var
   element_name, type_string, element_path, element_edit_value, prefix2, postfix2: string;
   native_value: Variant;
   parent_type, element_type: TwbElementType;
+  stringlist_length: integer;
 begin
   prefix2 := '    ';
 
   parent_type := ElementType(e);
   if ((parent_type = etArray) Or (parent_type = etSubRecordArray)) then
   begin
-    AddMessage(prefix + '[');
+//    json_output.append(prefix + '[');
+    stringlist_length := json_output.Count;
+    json_output[stringlist_length-1] := json_output[stringlist_length-1] + ' [';
   end
   else begin
-    AddMessage(prefix + '{');
+//    json_output.append(prefix + '{');
+    stringlist_length := json_output.Count;
+    // NOTE: stringlist_length = 0 will only happen at start of file, so above no need to check above
+    if (stringlist_length = 0) then
+    begin
+      json_output.append('{');
+    end else
+    begin
+      json_output[stringlist_length-1] := json_output[stringlist_length-1] + ' {';
+    end;
   end;
 
   element_count := ElementCount(e);
@@ -186,10 +203,7 @@ begin
         element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
       end;
 
-      // Display as: "EDID" [FormID]
-//      if (Pos('FormID', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-
-
+      // Display as: "EDID:FormID"
       if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
       if (Pos('QSTI - Quest', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
       if (Pos('AI Packages \ PKID - AI Package', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
@@ -208,65 +222,75 @@ begin
       if (Pos('Weather Type \ Chance', element_path) <> 0) then element_edit_value := IntToStr(native_value);
       if (Pos('CNTO - Item \ Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
 
-      if (Pos('\ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+      if ( (Pos('EFIT - EFIT \ Type', element_path) <> 0) And (native_type <> 8209) ) then
+      begin
+        element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+//        element_edit_value := '"' + GetEditValue(element);
+//        AddMessage('DEBUG: native_type=' + IntToStr(native_type));
+//        element_edit_value := element_edit_value + ':' + IntToStr(native_value) + '"';
+      end;
 
-      if (Pos('Flags', element_name) <> 0) then element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
-      if (CompareText('CELL \ DATA - Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
+//      AddMessage('DEBUG: element_path=' + element_path);
+      if (Pos('Unused', element_path) = 0) then
+      begin
 
-      if (Pos('\ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('Data Size', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('\ Damage', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('\ Armor', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('\ Health', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('Flags', element_name) <> 0) then element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
+        if (CompareText('CELL \ DATA - Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
 
-      if (Pos('EFID - Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
-      if (Pos('Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
-      if (CompareText('ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
-      if (Pos('EFIT - EFIT \ Magnitude', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('EFIT - EFIT \ Area', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('EFIT - EFIT \ Duration', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-//      if (Pos('EFIT - EFIT \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      if (Pos('EFIT - EFIT \ Actor Value', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      if (Pos('SCIT - Script effect data \ Script effect', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-      if (Pos('SCIT - Script effect data \ Magic school', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      if (Pos('SCIT - Script effect data \ Visual effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('\ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('Data Size', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('\ Damage', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('\ Armor', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('\ Health', element_path) <> 0) then element_edit_value := IntToStr(native_value);
 
-      if (Pos('INFO \ Conditions \ CTDA - Condition \ Function', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      //if (Pos('INFO \ Conditions \ CTDA - Condition \ Parameter', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+        if (Pos('EFID - Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+        if (Pos('Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+        if (CompareText('ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
+        if (Pos('EFIT - EFIT \ Magnitude', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('EFIT - EFIT \ Area', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('EFIT - EFIT \ Duration', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  //      if (Pos('EFIT - EFIT \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('EFIT - EFIT \ Actor Value', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('SCIT - Script effect data \ Script effect', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('SCIT - Script effect data \ Magic school', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('SCIT - Script effect data \ Visual effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
 
-      if (Pos('Primary Attribute', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      if (Pos('Major Skill', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      if (Pos('Specialization', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      if (Pos('Teaches', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('INFO \ Conditions \ CTDA - Condition \ Function', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        //if (Pos('INFO \ Conditions \ CTDA - Condition \ Parameter', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
 
-      if (Pos('Skill Boost \ Skill', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      if (Pos('Skill Boost \ Boost', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('RACE \ ATTR - Base Attributes', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('Body Data \ Parts \ Part \ INDX - Index', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      if (Pos('Face Data \ Parts \ Part \ INDX - Index', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('Primary Attribute', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('Major Skill', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('Specialization', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('Teaches', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
 
-      if (Pos('QUST \ DATA - General \ Priority', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('Stage \ INDX - Stage index', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('SCHR - Basic Script Data \ RefCount', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('SCHR - Basic Script Data \ CompiledSize', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('SCHR - Basic Script Data \ VariableCount', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('SCHR - Basic Script Data \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      if (Pos('SCRO - Global Reference', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos('Skill Boost \ Skill', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('Skill Boost \ Boost', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('RACE \ ATTR - Base Attributes', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('Body Data \ Parts \ Part \ INDX - Index', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('Face Data \ Parts \ Part \ INDX - Index', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
 
-      if (Pos(' \ DATA - Point Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos(' \ Connections', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos(' \ Point', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('QUST \ DATA - General \ Priority', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('Stage \ INDX - Stage index', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('SCHR - Basic Script Data \ RefCount', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('SCHR - Basic Script Data \ CompiledSize', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('SCHR - Basic Script Data \ VariableCount', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('SCHR - Basic Script Data \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('SCRO - Global Reference', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
 
-      if (Pos(' Color \ Red', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos(' Color \ Green', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos(' Color \ Blue', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('\ XCMT - Music', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-      if (Pos('XCLL - Lighting \ Directional Rotation XY', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-      if (Pos('XCLL - Lighting \ Directional Rotation Z', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos(' \ DATA - Point Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos(' \ Connections', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('PGRP - Points \ Point ', element_path) <> 0) then element_edit_value := IntToStr(native_value);
 
+        if (Pos(' Color \ Red', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos(' Color \ Green', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos(' Color \ Blue', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('\ XCMT - Music', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos('XCLL - Lighting \ Directional Rotation XY', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos('XCLL - Lighting \ Directional Rotation Z', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+      end;
 
 //      AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
-      AddMessage(prefix + prefix2 + type_string + '"' + element_path + '": ' + element_edit_value + postfix2);
+      json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value + postfix2);
     end
     else
     begin
@@ -277,12 +301,12 @@ begin
           element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
           if (CompareText('ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
           if (CompareText('CELL \ DATA - Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
-          AddMessage(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value );
+          json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value );
         end
         else
         begin
   //        AddMessage('TEST');
-          AddMessage(prefix + prefix2 + type_string + '"' + element_name + '":');
+          json_output.append(prefix + prefix2 + type_string + '"' + element_name + '":');
         end;
       end;
     end;
@@ -294,10 +318,10 @@ begin
 
   if ((parent_type = etArray) Or (parent_type = etSubRecordArray)) then
   begin
-    AddMessage(prefix + ']' + postfix);
+    json_output.append(prefix + ']' + postfix);
   end
   else begin
-    AddMessage(prefix + '}' + postfix);
+    json_output.append(prefix + '}' + postfix);
   end;
 
 end;
@@ -339,7 +363,7 @@ function Process(e: IInterface): integer;
 var
   element, parent: IInterface;
   string_offset, element_count, element_index, child_count: integer;
-  element_path, element_edit_value, prefix: string;
+  element_filename, element_path, element_edit_value, prefix: string;
   sig, x_string, parent_path, parent_basename: string;
   parent_type: TwbElementType;
 begin
@@ -348,25 +372,10 @@ begin
   prefix := '    ';
 
   // comment this out if you don't want those messages
-  AddMessage('Processing: ' + Name(e));
+//  AddMessage('Processing: ' + Name(e));
 
-//  AddMessage('DEBUG: PathName(): ' + PathName(e));
-//  AddMessage('DEBUG: FullPath(): ' + FullPath(e));
-
-// ==> if element_type == Container <===
-  // 1. If basename starts with 'GRUP Cell ...'
-      // 2. Then If '...Children of [' Then record CELL:<FormID>
-      // 3. Else If '...Persistent Children' Then record 'Persistent'
-      // 4. Else If '...Temporary...' Then ...
-      // 5. Else If '...Visible...' Then ...
-  // 6. Else if starts with 'GRUP Interior Cell ' ...
-  // 7. Else if starts with 'GRUP Exterior Cell ' ...
-  // 8. Else if starts with 'GRUP World Children ' ...
-  // 9. Else if starts with 'GRUP Top "' ...
-
-//  element_path := '{' + Path(e) + '}';
   parent := GetContainer(e);
-  element_path := IntToHex(GetLoadOrderFormID(e),8) + '.json';
+  element_filename := IntToHex(GetLoadOrderFormID(e),8) + '.json';
   while (Assigned(parent)) do
     begin
       parent_type := ElementType(parent);
@@ -469,14 +478,20 @@ begin
       element_path := parent_path + '\' + element_path;
       parent := GetContainer(parent);
     end;
-  AddMessage('DEBUG: composed path: ' + element_path);
-
-  AddMessage('');
+//  AddMessage('DEBUG: composed path: ' + element_path);
+//  AddMessage('');
 
   // processing code goes here
+  json_filecount := json_filecount + 1;
+  if (json_filecount mod 100 = 0) then AddMessage('INFO: ' + IntToStr(json_filecount) + ' files written...');
+//  json_output := TStringList.Create;
   ProcessChild(e, '', '');
+  ForceDirectories(element_path);
+  json_output.SaveToFile(element_path + element_filename);
+//  json_output.Free;
+  json_output.Clear;
 
-  AddMessage('');
+//  AddMessage('');
 
 end;
 
@@ -484,6 +499,8 @@ end;
 // You can remove it if script doesn't require finalization code
 function Finalize: integer;
 begin
+  AddMessage('Script Complete.  ' + IntToStr(json_filecount) + ' json files written.');
+  json_output.Free;
   Result := 0;
 end;
 
