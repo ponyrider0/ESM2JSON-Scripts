@@ -162,6 +162,12 @@ end;
 
 function ProcessSubRecord(e: IInterface; prefix: string; postfix: string): integer;
 var
+  element: IInterface;
+  native_type, element_count, element_index, child_count: integer;
+  element_name, type_string, element_path, element_edit_value, prefix2, postfix2: string;
+  native_value: Variant;
+  parent_type, element_type: TwbElementType;
+  stringlist_length: integer;
 begin
   prefix2 := '    ';
 
@@ -293,7 +299,7 @@ begin
     end;
 
 //    if (Assigned(element_type)) then AddMessage('DEBUG: ElementType: ' + IntToStr(element_type));
-    if (child_count > 0) then ProcessChild(element, prefix + prefix2, postfix2);
+    if (child_count > 0) then ProcessSubRecord(element, prefix + prefix2, postfix2);
 
   end;
 
@@ -454,7 +460,7 @@ begin
     end;
 
 //    if (Assigned(element_type)) then AddMessage('DEBUG: ElementType: ' + IntToStr(element_type));
-    if (child_count > 0) then ProcessChild(element, prefix + prefix2, postfix2);
+    if (child_count > 0) then ProcessSubRecord(element, prefix + prefix2, postfix2);
 
   end;
 
