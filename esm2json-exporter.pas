@@ -421,16 +421,16 @@ begin
         // 9. Else if starts with 'GRUP Top "' ...
         else if (Pos('GRUP Top ',parent_basename) = 1) then
         begin
-          sig := Signature(e);
-          if ( (sig = 'INFO') Or (CompareText(sig, 'LAND')=0) Or (CompareText(sig, 'PGRD')=0) Or (IsReference(e)) ) then
-          begin
-            parent_path := copy(parent_basename, 11, 4);
-          end
-          else
-          begin
-            parent_path := sig;
-          end;
-
+          // sig := Signature(e);
+          // if ( (sig = 'INFO') Or (CompareText(sig, 'LAND')=0) Or (CompareText(sig, 'PGRD')=0) Or (IsReference(e)) ) then
+          // begin
+          //   parent_path := copy(parent_basename, 11, 4);
+          // end
+          // else
+          // begin
+          //   parent_path := sig;
+          // end;
+          parent_path := copy(parent_basename, 11, 4);
         end;
       end
       // Not GroupRecord
