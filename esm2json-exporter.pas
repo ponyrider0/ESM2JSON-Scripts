@@ -6,6 +6,7 @@ unit esm2json_exporter;
 var
   json_output: TStringList;
   json_filecount: integer;
+  target_mod_file: IwbFile;
 
 // Called before processing
 // You can remove it if script doesn't require initialization code
@@ -14,12 +15,34 @@ begin
   Result := 0;
 
   json_output := TStringList.Create;
-//  PrintElementTypes();
-//  PrintVarTypes();
+  PrintElementTypes();
+  PrintVarTypes();
 
 end;
 
 
+// varEmpty: 0
+// varNull: 1
+// varSmallint: 2
+// varInteger: 3
+// varSingle: 4
+// varDouble: 5
+// varCurrency: 6
+// varDate: 7
+// varOleStr: 8
+// varDispatch: 9
+// varError: 10
+// varBoolean: 11
+// varVariant: 12
+// varUnknown: 13
+// varShortInt: 16
+// varByte: 17
+// varWord: 18
+// varLongWord: 19
+// varInt64: 20
+// varStrArg: 72
+// varString: 256
+// varAny: 257
 procedure PrintVarTypes;
 begin
   AddMessage('');
@@ -49,7 +72,20 @@ begin
 
 end;
 
-
+// etFile: 0
+// etMainRecord: 1
+// etGroupRecord: 2
+// etSubRecord: 3
+// etSubRecordStruct: 4
+// etSubRecordArray: 5
+// etSubRecordUnion: 6
+// etArray: 7
+// etStruct: 8
+// etValue: 9
+// etFlag: 10
+// etStringListTerminator: 11
+// etUnion: 12
+// etStructChapter: 13
 procedure PrintElementTypes;
 begin
   AddMessage('');
@@ -89,14 +125,27 @@ begin
 end;
 
 
-function GetFormIDLabel(e: IInterface; formid: Cardinal): string;
+function ReplaceEmptyFlagsString(element_path: string; native_value: Variant; element_edit_value: string=''): string;
+begin
+
+  if ( (Pos(' Flags', element_path) <> 0) ) then
+  begin
+    if (native_value = 0) then element_edit_value := '{}';
+  end;
+
+  Result := element_edit_value;
+
+end;
+
+
+function GetFormIDLabel(formid: Cardinal): string;
 var
   name_string: string;
   base_formID: Cardinal;
   base_record, target_record: IInterface;
 begin
 
-  target_record := RecordByFormID(GetFile(e), formid, True);
+  target_record := RecordByFormID(target_mod_file, formid, True);
   name_string := EditorID(target_record);
   if ( (name_string = '') And (IsReference(target_record)) ) then
   begin
@@ -160,7 +209,7 @@ begin
 end;
 
 
-function ProcessCellRecords(e: IInterface; element_path:string; native_value: Variant; element_edit_value:string ): string;
+function ProcessCellRecords(element_path:string; native_value: Variant; element_edit_value:string ): string;
 begin
 
   // * \ XCLL - Lighting \ * (CELL)
@@ -172,7 +221,7 @@ begin
   if (Pos(' \ XCLL - Lighting \ Directional Rotation XY', element_path) <> 0) then element_edit_value := IntToStr(native_value);
   if (Pos(' \ XCLL - Lighting \ Directional Rotation Z', element_path) <> 0) then element_edit_value := IntToStr(native_value);
   // REFR \ XTEL - Teleport Destination \ Door
-  if (Pos(' \ XTEL - Teleport Destination \ Door', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos(' \ XTEL - Teleport Destination \ Door', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
   // PGRD \ PGRP - Points \ *
   // PGRD \ PGRP - Points \ Point #** \ X|Y|Z|Connections
   if (Pos(' \ PGRP - Points \ Point #', element_path) <> 0) then element_edit_value := IntToStr(native_value);
@@ -198,7 +247,7 @@ end;
 
 
 
-function ProcessNonCellRecords(e: IInterface; element: IInterface; element_path:string; native_value: Variant; element_edit_value:string ): string;
+function ProcessNonCellRecords(element: IInterface; element_path:string; native_value: Variant; element_edit_value:string ): string;
 begin
 
   // * \ DATA - DATA \ *
@@ -220,16 +269,16 @@ begin
   // CLAS \ DATA - DATA \ Teaches
   // CLAS \ DATA - DATA \ Maximum training level
   // CLMT \ WLST - Weather Types \ **
-  if (Pos(' \ WLST - Weather Types \ Weather Type \ Weather', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos(' \ WLST - Weather Types \ Weather Type \ Weather', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
   if (Pos(' \ WLST - Weather Types \ Weather Type \ Chance', element_path) <> 0) then element_edit_value := IntToStr(native_value);
   // CLMT \ TNAM - Timing \ ** \ Begin|End
   // CLMT \ TNAM - Timing \ Volatility|Moons / Phase Length
   // CLOT \ *
   // * \ Items \ CNTO - Item \ * (CONT,CREA,NPC_)
-  if (Pos(' \ Items \ CNTO - Item \ Item', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos(' \ Items \ CNTO - Item \ Item', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
   if (Pos(' \ Items \ CNTO - Item \ Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
   // * \ Spells \ SPLO - Spell (CREA,NPC_,RACE)
-  if (Pos(' \ Spells \ SPLO - Spell', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos(' \ Spells \ SPLO - Spell', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
   // * \ ACBS - Configuration \ *
   // * \ ACBS - Configuration \ Base spell points|Fatigue|Barter gold|Level (offset)|Calc min|Calc max (CREA, NPC_)
   // * \ ACBS - Configuration \ Flags
@@ -246,7 +295,7 @@ begin
   if (Pos(' \ AIDT - AI Data \ Teaches', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
   // * \ AIDT - AI Data \ Buys/Sells and Services
   // * \ AI Packages \ PKID - AI Package (CREA)
-  if (Pos(' \ AI Packages \ PKID - AI Package', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos(' \ AI Packages \ PKID - AI Package', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
   // CREA \ DATA - Creature Data \ *
   // CREA \ DATA - Creature Data \ Type ==> "Creature?"
   // CREA \ DATA - Creature Data \ Soul ==> "Common?"
@@ -279,9 +328,9 @@ begin
   if (Pos(' \ SCHR - Basic Script Data \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
   // INFO \ Result Script \ References \ SCRO - Global Reference
   // SCPT \ References \ SCRO - Global Reference
-  if (Pos(' \ References \ SCRO - Global Reference', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos(' \ References \ SCRO - Global Reference', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
   // INFO \ Choices\ TCLT - Choice
-  if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
   // * \ ENIT - ENIT \ * (ALCH,ENCH,INGR)
   // * \ ENIT - ENIT \ Charge Amount|Enchant Cost
   // * \ ENIT - ENIT \ Type
@@ -295,7 +344,7 @@ begin
 //        if ( (Pos('EFIT - EFIT \ Type', element_path) <> 0) And (native_type <> 8209) ) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
   if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
   if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Actor Value', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-  if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Script effect', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Script effect', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
   if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Magic school', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
   if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Visual effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
   // EYES \ DATA - Flags
@@ -429,12 +478,12 @@ begin
   begin
 //    json_output.append(prefix + '[');
     stringlist_length := json_output.Count;
-    json_output[stringlist_length-1] := json_output[stringlist_length-1] + ' [';
+    json_output[stringlist_length-1] := json_output[stringlist_length-1] + '[';
   end
   else begin
 //    json_output.append(prefix + '{');
     stringlist_length := json_output.Count;
-    json_output[stringlist_length-1] := json_output[stringlist_length-1] + ' {';
+    json_output[stringlist_length-1] := json_output[stringlist_length-1] + '{';
   end;
 
   element_count := ElementCount(e);
@@ -454,6 +503,7 @@ begin
 
     type_string := '';
     // DEBUGGING
+    type_string := '[' + IntToStr(element_type) + ']';
 //    AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
 //    AddMessage('DEBUG: element_path=' + element_path + ', element_type=' + IntToStr(element_type));
 //  if ( (element_type = etValue) or (element_type = etFlag) or (element_type = etSubRecord)) then
@@ -465,7 +515,6 @@ begin
 
         element_edit_value := FormatNativeValue(native_value, element_edit_value);
 
-        // MOVE TO SUBRECORD:
         // Record Header: Signature, Data Size, Record Flags, FormID, Version Control Info
         if (Pos(' \ Record Header \ Data Size', element_path) <> 0) then element_edit_value := IntToStr(native_value);
         // * \ Model \ *,
@@ -474,15 +523,14 @@ begin
         if ( (Pos('CELL', element_path) <> 0) Or (Pos('PGRD', element_path) <> 0) Or (Pos('LAND', element_path) <> 0)
           Or (Pos('REFR', element_path) <> 0) Or (Pos('ACHR', element_path) <> 0) Or (Pos('ACRE', element_path) <> 0) ) then
         begin
-          element_edit_value := ProcessCellRecords(e, element_path, native_value, element_edit_value)
+          element_edit_value := ProcessCellRecords(element_path, native_value, element_edit_value)
         end
         else
         begin
-
-//          AddMessage('DEBUG: element_path=' + element_path + ', element_type=' + IntToStr(element_type));
-          element_edit_value := ProcessNonCellRecords(e, element, element_path, native_value, element_edit_value)
-
+          element_edit_value := ProcessNonCellRecords(element, element_path, native_value, element_edit_value)
         end;
+
+        element_edit_value := ReplaceEmptyFlagsString(element_path, native_value, element_edit_value);
 
       end;
 
@@ -491,10 +539,18 @@ begin
     // if child_count <> 0
     else
     begin
-      json_output.append(prefix + prefix2 + type_string + '"' + element_name + '":');
-    end;
 
-    if (child_count > 0) then ProcessSubRecord(element, prefix + prefix2, postfix2);
+      if ((parent_type = etArray) Or (parent_type = etSubRecordArray)) then
+      begin
+        json_output.append(prefix);
+        prefix2 := '';
+      end
+      else
+      begin
+        json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ');
+      end;
+      ProcessSubRecord(element, prefix + prefix2, postfix2);
+    end;
 
   end;
 
@@ -540,7 +596,8 @@ begin
 
     type_string := '';
     // DEBUGGING
-//  type_string := '[' + IntToStr(element_type) + ']';
+  type_string := '[' + IntToStr(element_type) + ']';
+//    AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
 //    AddMessage('DEBUG: element_path=' + element_path + ', element_type=' + IntToStr(element_type));
 //  if ( (element_type = etValue) or (element_type = etFlag) or (element_type = etSubRecord)) then
     if (child_count = 0) then
@@ -555,29 +612,29 @@ begin
         // * \ EDID - Editor ID, * \ FULL - Name, * \ SCRI - Script
         // * \ ENAM - Enchantment, * \ ANAM - Enchantment Points
         // BOOK \ DESC - Description
-        if (Pos(' \ SCRI - Script', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos(' \ ENAM - Enchantment', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ SCRI - Script', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
+        if (Pos(' \ ENAM - Enchantment', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         if (Pos(' \ ANAM - Enchantment Points', element_path) <> 0) then element_edit_value := IntToStr(native_value);
         // * \ DATA - IDLE animation
-        if (Pos(' \ DATA - IDLE animation', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ DATA - IDLE animation', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         // * \ XCMT - Music (CELL)
         if (Pos(' \ XCMT - Music', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
         // * \ Name - Base (ACHR, REFR,)
-        if (Pos(' \ NAME - Base', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ NAME - Base', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         // PGRD \ Data - Point Count
         if (Pos(' \ DATA - Point Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
         // * \ SNAM - Open sound (CONT,DOOR)
-        if (Pos(' \ SNAM - Open sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ SNAM - Open sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         // * \ QNAM - Close sound (CONT,DOOR)
-        if (Pos(' \ QNAM - Close sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ QNAM - Close sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         // CREA \ RNAM - Attack reach ==> int
         // TODO: ==> verify
         // CREA \ ZNAM - Combat Style ==> formid
-        if (Pos(' \ ZNAM - Combat Style', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ ZNAM - Combat Style', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         // CREA \ CSCR - Inherits Sounds from ==> formid
-        if (Pos(' \ CSCR - Inherits Sounds from', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ CSCR - Inherits Sounds from', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         // INFO \ QSTI - Quest ==> formid
-        if (Pos(' \ QSTI - Quest', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ QSTI - Quest', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         // INFO \ PNAM - Previous Info ==> formid
         // DOOR \ FNAM - Flags
         // FLOR \ PFIG - Ingredient ==> formid
@@ -588,26 +645,25 @@ begin
         // * \ LVLD - Chance none (LVLC,LVLI)
         // TODO: ==> verify
         // NPC_ \ RNAM - Race
-        if (Pos(' \ RNAM - Race', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ RNAM - Race', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         // NPC_ \ CNAM - Class
         // RACE \ CNAM - Default Hair Color ==> int
         // REGN \ WNAM - Worldspace ==> formid
         // SLGM \ SOUL - Contained Soul
         // SLGM \ SLGM - Maximum Capacity
 
+        element_edit_value := ReplaceEmptyFlagsString(element_path, native_value, element_edit_value);
+
       end;
 
-//      AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
       json_output.append(prefix + prefix2 + type_string + '"' + element_path + '": ' + element_edit_value + postfix2);
     end
     // if child_count <> 0
     else
     begin
-      json_output.append(prefix + prefix2 + type_string + '"' + element_path + '":');
+      json_output.append(prefix + prefix2 + type_string + '"' + element_path + '": ');
+      ProcessSubRecord(element, prefix + prefix2, postfix2);
     end;
-
-//    if (Assigned(element_type)) then AddMessage('DEBUG: ElementType: ' + IntToStr(element_type));
-    if (child_count > 0) then ProcessSubRecord(element, prefix + prefix2, postfix2);
 
   end;
 
@@ -625,6 +681,8 @@ var
   parent_type: TwbElementType;
 begin
   Result := 0;
+
+  if not Assigned(target_mod_file) then target_mod_file := GetFile(e);
 
   prefix := '    ';
 
