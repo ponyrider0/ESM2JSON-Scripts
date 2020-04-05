@@ -590,57 +590,9 @@ begin
         // WTHR \ Sounds \ SNAM - Sound \ *
         // WTHR \ Sounds \ SNAM - Sound \ Sound ==> formid
         // WTHR \ Sounds \ SNAM - Sound \ Type
-
-
-
-        // ACTI - done
-        // ALCH - done
-        // AMMO - done
-        // ANIO - done
-        // APPA - done
-        // ARMO - done
-        // BOOK - done
-        // CELL - done
-        // ACHR - done
-        // REFR - done
-        // PGRD - done
-        // CLAS - done
-        // CLMT - done
-        // CLOT - done
-        // CONT - done
-        // CREA - done
-        // CSTY - done
-        // DIAL -
-        // INFO - done
-        // DOOR - done
-        // ENCH - done
-        // EYES - done
-        // FACT - done
-        // FLOR - done
-        // FURN - done
-        // GLOB - done
-        // INGR - done
-        // KEYM - done
-        // LTEX - done
-        // LVLC - done
-        // LVLI - done
-        // MISC - done
-        // NPC_ - done
-        // PACK - done
-        // QUST - done
-        // RACE - done
-        // REGN - done
-        // SCPT - done
-        // SLGM - done
-        // SOUN - done
-        // STAT - done
-        // TREE - done
-        // WEAP - done
-        // WRLD -
-        // LAND - done
-        // WTHR - done
-
-
+        // WRLD \ MNAM - Map Data \ *
+        // WRLD \ MNAM - Map Data \ Usable Dimensions \ X|Y
+        // WRLD \ MNAM - Map Data \ Cell Coordinates \ ** NW|SE ** Cell \ X|Y
 
 
 
@@ -689,9 +641,6 @@ begin
         // REGN \ WNAM - Worldspace ==> formid
         // SLGM \ SOUL - Contained Soul
         // SLGM \ SLGM - Maximum Capacity
-
-
-
 
       end;
 
