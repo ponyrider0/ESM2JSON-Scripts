@@ -15,8 +15,8 @@ begin
   Result := 0;
 
   json_output := TStringList.Create;
-  PrintElementTypes();
-  PrintVarTypes();
+//  PrintElementTypes();
+//  PrintVarTypes();
 
 end;
 
@@ -531,6 +531,7 @@ begin
         end;
 
         element_edit_value := ReplaceEmptyFlagsString(element_path, native_value, element_edit_value);
+        if ((element_type = etArray) Or (element_type = etSubRecordArray)) then element_edit_value := '[]';
 
       end;
 
@@ -542,8 +543,7 @@ begin
 
       if ((parent_type = etArray) Or (parent_type = etSubRecordArray)) then
       begin
-        json_output.append(prefix);
-        prefix2 := '';
+        json_output.append(prefix + prefix2);
       end
       else
       begin
@@ -653,6 +653,7 @@ begin
         // SLGM \ SLGM - Maximum Capacity
 
         element_edit_value := ReplaceEmptyFlagsString(element_path, native_value, element_edit_value);
+        if ((element_type = etArray) Or (element_type = etSubRecordArray)) then element_edit_value := '[]';
 
       end;
 
