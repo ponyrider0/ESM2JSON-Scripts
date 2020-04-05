@@ -351,7 +351,7 @@ begin
     begin
 
 //      AddMessage('DEBUG: element_path=' + element_path);
-      if (Pos('Unused', element_path) = 0) then
+      if ( (Pos('Unused', element_path) = 0) And (Pos('Unknown', element_path) = 0) ) then
       begin
 
         element_edit_value := FormatNativeValue(native_value, element_edit_value);
@@ -462,7 +462,7 @@ begin
         // * \ ENIT - ENIT \ * (ALCH,ENCH,INGR)
         // * \ ENIT - ENIT \ Charge Amount|Enchant Cost
         // * \ ENIT - ENIT \ Type
-        if (Pos(' \ ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
+        if (Pos(' \ ENIT - ENIT \ Flags', element_path) <> 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
         if (Pos(' \ ENIT - ENIT \ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
         // * \ Effects \ Effect \ *
         if (Pos(' \ Effects \ Effect \ EFID - Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
