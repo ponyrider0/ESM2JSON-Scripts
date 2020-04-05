@@ -160,7 +160,7 @@ begin
 end;
 
 
-function ProcessCellRecords(element_path:string; native_value: Variant; element_edit_value:string ): string;
+function ProcessCellRecords(e: IInterface; element_path:string; native_value: Variant; element_edit_value:string ): string;
 begin
 
   // * \ XCLL - Lighting \ * (CELL)
@@ -195,6 +195,221 @@ begin
   Result := element_edit_value;
 
 end;
+
+
+
+function ProcessNonCellRecords(e: IInterface; element: IInterface; element_path:string; native_value: Variant; element_edit_value:string ): string;
+begin
+
+  // * \ DATA - DATA \ *
+  if (Pos(' \ DATA - DATA \ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  if (Pos(' \ DATA - DATA \ Damage', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  if (Pos(' \ DATA - DATA \ Armor', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  if (Pos(' \ DATA - DATA \ Health', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  // * \ DATA - DATA \ Type
+  if (Pos(' \ DATA - DATA \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  // * \ DATA - DATA \ Teaches (BOOK)
+  if (Pos(' \ DATA - DATA \ Teaches', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  // CLAS \ DATA - DATA \ Primary Attributes \ *
+  if (Pos(' \ DATA - DATA \ Primary Attributes \ ', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+    // CLAS \ DATA - DATA \ Major Skills \ *
+  if (Pos(' \ DATA - DATA \ Major Skill \ ', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+    // CLAS \ DATA - DATA \ Specialization
+  if (Pos(' \ DATA - DATA \ Specialization', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  // CLAS \ DATA - DATA \ Buys/Sells and Services
+  // CLAS \ DATA - DATA \ Teaches
+  // CLAS \ DATA - DATA \ Maximum training level
+  // CLMT \ WLST - Weather Types \ **
+  if (Pos(' \ WLST - Weather Types \ Weather Type \ Weather', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos(' \ WLST - Weather Types \ Weather Type \ Chance', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  // CLMT \ TNAM - Timing \ ** \ Begin|End
+  // CLMT \ TNAM - Timing \ Volatility|Moons / Phase Length
+  // CLOT \ *
+  // * \ Items \ CNTO - Item \ * (CONT,CREA,NPC_)
+  if (Pos(' \ Items \ CNTO - Item \ Item', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos(' \ Items \ CNTO - Item \ Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  // * \ Spells \ SPLO - Spell (CREA,NPC_,RACE)
+  if (Pos(' \ Spells \ SPLO - Spell', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  // * \ ACBS - Configuration \ *
+  // * \ ACBS - Configuration \ Base spell points|Fatigue|Barter gold|Level (offset)|Calc min|Calc max (CREA, NPC_)
+  // * \ ACBS - Configuration \ Flags
+  // TODO: verify ==>
+  if (Pos(' \ ACBS - Configureation \ ', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  // * \ Factions \ SNAM - Faction (CREA, NPC_)
+  // * \ Factions \ SNAM - Faction \ Faction ==> FormID
+  // * \ Factions \ SNAM - Faction \ Rank ==> int
+  // * \ AIDT - AI Data \ * (CREA, NPC_)
+  // * \ AIDT - AI Data \ Aggression|Confidence|Energy Level|Responsibility|Maximum training level
+  // ==> over-ride above
+  // * \ AIDT - AI Data \ Teaches
+  // TODO: verify ==>
+  if (Pos(' \ AIDT - AI Data \ Teaches', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  // * \ AIDT - AI Data \ Buys/Sells and Services
+  // * \ AI Packages \ PKID - AI Package (CREA)
+  if (Pos(' \ AI Packages \ PKID - AI Package', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  // CREA \ DATA - Creature Data \ *
+  // CREA \ DATA - Creature Data \ Type ==> "Creature?"
+  // CREA \ DATA - Creature Data \ Soul ==> "Common?"
+  // ==> over-ride above
+  // CREA \ DATA - Creature Data \ Combat Skill|Magic Skill|Stealth Skill|Health|Attack Damage|Strength|Intelligence|Willpower|Agility|Speed|Endurance|Personality|Luck
+  // CSTY \ CSTD - Standard \ *
+  // CSTY \ CSAD - Advanced \ *
+  // INFO \ Responses \ *
+  // INFO \ Responses \ TRDT - Response Data \ *
+  // INFO \ Responses \ TRDT - Response Data \ Emotion Type
+  // INFO \ Responses \ TRDT - Response Data \ Emotion Value
+  // INFO \ Responses \ TRDT - Response Data \ Response number
+  // INFO \ Responses \ NAM1 - Response Text => txt
+  // INFO \ Responses \ NAM2 - Actor notes => txt
+  // * \ Conditions \ CTDA - Condition \ * (INFO, IDLE, PACK, QUST)
+  // * \ Conditions \ CTDA - Condition \ Type
+  // * \ Conditions \ CTDA - Condition \ Function
+  // * \ Conditions \ CTDA - Condition \ Parameter #1
+  // * \ Conditions \ CTDA - Condition \ Paramater #2
+  if (Pos(' \ Conditions \ CTDA - Condition \ Function', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  //if (Pos(' \ Conditions \ CTDA - Condition \ Parameter', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+  // * \ Result Script \ SCHR - Basic Script Data \ * (INFO, QUST\Stages\LogEntries\LogEntry\ResultScript,)
+  // * \ Result Script \ SCHR - Basic Script Data \ Type
+  // * \ Result Script \ SCHR - Basic Script Data \ RefCount|CompiledSize|VariableCount
+  // SCPT \ SCHR - Basic Script Data \ *
+  if (Pos(' \ SCHR - Basic Script Data \ RefCount', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  if (Pos(' \ SCHR - Basic Script Data \ CompiledSize', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  if (Pos(' \ SCHR - Basic Script Data \ VariableCount', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  // over-ride above
+  if (Pos(' \ SCHR - Basic Script Data \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  // INFO \ Result Script \ References \ SCRO - Global Reference
+  // SCPT \ References \ SCRO - Global Reference
+  if (Pos(' \ References \ SCRO - Global Reference', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  // INFO \ Choices\ TCLT - Choice
+  if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  // * \ ENIT - ENIT \ * (ALCH,ENCH,INGR)
+  // * \ ENIT - ENIT \ Charge Amount|Enchant Cost
+  // * \ ENIT - ENIT \ Type
+  if (Pos(' \ ENIT - ENIT \ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  // * \ Effects \ Effect \ *
+  if (Pos(' \ Effects \ Effect \ EFID - Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+  if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+  if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Magnitude', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Area', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Duration', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+//        if ( (Pos('EFIT - EFIT \ Type', element_path) <> 0) And (native_type <> 8209) ) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Actor Value', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Script effect', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+  if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Magic school', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Visual effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  // EYES \ DATA - Flags
+  // FACT \ Relations \ XNAM - Relation \ *
+  // FACT \ Relations \ XNAM - Relation \ Faction => formid
+  // FACT \ Relations \ XNAM - Relation \ Modifier => int
+  // FLOR \ PFPC - Seasonal ingredient production \ Spring|Summer|Fall|Winter => int
+  // * \ DATA - DATA \ * (GRAS)
+  // * \ DATA - DATA \ Density|Min Slope|Max Slope
+  // * \ DATA - DATA \ Unit from water amount|Unit from water type
+  // HAIR \ DATA - Flags ?
+  // IDLE \ Data - Related Idle Animations \ * ==> formid
+  // LIGH \ DATA - DATA \ *
+  // LIGH \ DATA - DATA \ Time
+  // LIGH \ DATA - DATA \ Radius
+  // LIGH \ DATA - DATA \ Color \ Red|Green|Blue
+  // LTEX \ HNAM - Havok Data \ *
+  // LTEX \ HNAM - Havok Data \ Material Type
+  // LTEX \ HNAM - Havok Data \ Friction
+  // LTEX \ HNAM - Havok Data \ Restitution
+  // LTEX \ Grasses \ GNAM - Grass ==> formid
+  // * \ Leveled List Entries \ LVLO - Leveled List Entry \ * (LVLC,LVLI)
+  // * \ Leveled List Entries \ LVLO - Leveled List Entry \ Reference ==> formid
+  // * \ Leveled List Entries \ LVLO - Leveled List Entry \ Level|Count
+  // MISC \ DATA - DATA \ *
+  // MISC \ DATA - DATA \ ????
+  // NPC_ \ DATA - Stats \ *
+  // NPC_ \ DATA - Stats \ Armorer|Athletics|Blade|Block|Blunt|Hand to Hand|Heavy Armor|Alchemy|...
+  // NPC_ \ HCLR - Hair color \ *
+  // NPC_ \ HCLR - Hair color \ Red|Green|Blue
+  // * \ FaceGen Data \ * (NPC_, RACE)
+  // * \ FaceGen Data \ FGGS - ...
+  // * \ FaceGen Data \ FGGA - ...
+  // * \ FaceGen Data \ FGTS - ...
+  // PACK \ PKDT - General \ General \ *
+  // PACK \ PKDT - General \ General \ Type
+  // PACK \ PLDT - Location \ *
+  // PACK \ PLDT - Location \ Type
+  // PACK \ PLDT - Location \ Location
+  // PACK \ PLDT - Location \ Radius
+  // PACK \ PSDT - Schedule \ *
+  // PACK \ PSDT - Schedule \ Month|Day of week
+  // PACK \ PSDT - Schedule \ Date
+  // PACK \ PSDT - Schedule \ Time
+  // PACK \ PSDT - Schedule \ Duration
+  // PACK \ PTDT - Target \ *
+  // PACK \ PTDT - Target \ Type
+  // PACK \ PTDT - Target \ Target ==> formid
+  // PACK \ PTDT - Target \ Count ==> int
+  // QUST \ DATA - General \ Priority ==> int
+  if (Pos('QUST \ DATA - General \ Priority', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  // QUST \ Stages \ *
+  // QUST \ Stages \ Stage \ INDX - ...
+  if (Pos('Stage \ INDX - Stage index', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  // QUST \ Stages \ Log Entries \ Log Entry \ *
+  // QUST \ Stages \ Log Entries \ Log Entry \ QSDT - Stage Flags
+  // QUST \ Stages \ Log Entries \ Log Entry \ CNAM - Log Entry ==> text
+  // QUST \ Stages \ Log Entries \ Log Entry \ Result Script \ *
+  // QUST \ Targets \ Target \ *
+  // QUST \ Targets \ Target \ QSTA - Target \ *
+  // QUST \ Targets \ Target \ QSTA - Target \ Target ==> formid
+  // QUST \ Targets \ Target \ Conditions \ CTDA - Condition \ *
+  // RACE \ DATA - DATA \ Skill Boosts \ Skill Boost \ *
+  // RACE \ DATA - DATA \ Skill Boosts \ Skill Boost \ Skill
+  if (Pos('Skill Boost \ Skill', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  // RACE \ DATA - DATA \ Skill Boosts \ Skill Boost \ Boost
+  if (Pos('Skill Boost \ Boost', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  // RACE \ DNAM - Default Hair \ Male|Female ==> formid
+  // RACE \ ATTR - Base Attributes \ Male \ *
+  // RACE \ ATTR - Base Attributes \ Female \ *
+  if (Pos('RACE \ ATTR - Base Attributes \ ', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  // RACE \ Face Data \ NAM0 - Face Data Marker
+  // RACE \ Face Data \ Parts \ *
+  // RACE \ Face Data \ Parts \ Part \ INDX - ...
+  if (Pos(' \ Face Data \ Parts \ Part \ INDX - Index', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  // RACE \ Face Data \ NAM1 - Body Data Marker
+  // RACE \ Male Body Data \ Parts \ *
+  // RACE \ Female Body Data \ Parts \ *
+  if (Pos(' Body Data \ Parts \ Part \ INDX - Index', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  // RACE \ HNAM - Hairs \ Hair ==> formid
+  // RACE \ ENAM - Eyes \ Eye ==> formid
+  // REGN \ Region Areas \ Region Area \ *
+  // REGN \ Region Areas \ Region Area \ RPLI - ...
+  // REGN \ Region Areas \ Region Area \ RPLD - ...
+  // REGN \ Region Data Entries \ Region Data Entry \ *
+  // REGN \ Region Data Entries \ Region Data Entry \ RDAT - Data Header \ *
+  // REGN \ Region Data Entries \ Region Data Entry \ RDAT - Data Header \ Type
+  // REGN \ Region Data Entries \ Region Data Entry \ RDAT - Data Header \ Priority
+  // REGN \ Region Data Entries \ Region Data Entry \ RDMD - Music Type
+  // REGN \ Region Data Entries \ Region Data Entry \ RDSD - Sounds
+  // SOUN \ SNDX - Sound Data \ *
+  // SOUN \ SNDX - Sound Data \ Minimum...|Maximum...|Freq..
+  // SOUN \ SNDX - Sound Data \ Static Atten...
+  // SOUN \ SNDX - Sound Data \ Stop time|Start time
+  // SPEL \ SPIT - SPIT \ *
+  // SPEL \ SPIT - SPIT \ Type
+  // SPEL \ SPIT - SPIT \ Cost
+  // SPEL \ SPIT - SPIT \ Level
+  // TREE \ CNAM - Tree Data \ Shadow Radius
+  // WEAP \ DATA - DATA \ Type
+  // WTHR \ NAM0 - Colors by Types/Times \ *
+  // WTHR \ NAM0 - Colors by Types/Times \ Type #*** \ *
+  // WTHR \ NAM0 - Colors by Types/Times \ Type #*** \ Time #*** \ *
+  // WTHR \ NAM0 - Colors by Types/Times \ Type #*** \ Time #*** \ Red|Green|Blue
+  // WTHR \ DATA - DATA \ *
+  // WTHR \ DATA - DATA \ Wind Speed|Cloud Speed *|Trans Delta|Sun Glare|...
+  // WTHR \ Sounds \ SNAM - Sound \ *
+  // WTHR \ Sounds \ SNAM - Sound \ Sound ==> formid
+  // WTHR \ Sounds \ SNAM - Sound \ Type
+
+  Result := element_edit_value;
+
+end;
+
 
 
 
@@ -239,6 +454,7 @@ begin
 
     type_string := '';
     // DEBUGGING
+//    AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
 //    AddMessage('DEBUG: element_path=' + element_path + ', element_type=' + IntToStr(element_type));
 //  if ( (element_type = etValue) or (element_type = etFlag) or (element_type = etSubRecord)) then
     if (child_count = 0) then
@@ -258,220 +474,18 @@ begin
         if ( (Pos('CELL', element_path) <> 0) Or (Pos('PGRD', element_path) <> 0) Or (Pos('LAND', element_path) <> 0)
           Or (Pos('REFR', element_path) <> 0) Or (Pos('ACHR', element_path) <> 0) Or (Pos('ACRE', element_path) <> 0) ) then
         begin
-          element_edit_value := ProcessCellRecords(element_path, native_value, element_edit_value)
+          element_edit_value := ProcessCellRecords(e, element_path, native_value, element_edit_value)
         end
         else
         begin
 
-          // * \ DATA - DATA \ *
-          if (Pos(' \ DATA - DATA \ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          if (Pos(' \ DATA - DATA \ Damage', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          if (Pos(' \ DATA - DATA \ Armor', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          if (Pos(' \ DATA - DATA \ Health', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          // * \ DATA - DATA \ Type
-          if (Pos(' \ DATA - DATA \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          // * \ DATA - DATA \ Teaches (BOOK)
-          if (Pos(' \ DATA - DATA \ Teaches', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          // CLAS \ DATA - DATA \ Primary Attributes \ *
-          if (Pos(' \ DATA - DATA \ Primary Attributes \ ', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-            // CLAS \ DATA - DATA \ Major Skills \ *
-          if (Pos(' \ DATA - DATA \ Major Skill \ ', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-            // CLAS \ DATA - DATA \ Specialization
-          if (Pos(' \ DATA - DATA \ Specialization', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          // CLAS \ DATA - DATA \ Buys/Sells and Services
-          // CLAS \ DATA - DATA \ Teaches
-          // CLAS \ DATA - DATA \ Maximum training level
-          // CLMT \ WLST - Weather Types \ **
-          if (Pos(' \ WLST - Weather Types \ Weather Type \ Weather', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-          if (Pos(' \ WLST - Weather Types \ Weather Type \ Chance', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          // CLMT \ TNAM - Timing \ ** \ Begin|End
-          // CLMT \ TNAM - Timing \ Volatility|Moons / Phase Length
-          // CLOT \ *
-          // * \ Items \ CNTO - Item \ * (CONT,CREA,NPC_)
-          if (Pos(' \ Items \ CNTO - Item \ Item', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-          if (Pos(' \ Items \ CNTO - Item \ Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          // * \ Spells \ SPLO - Spell (CREA,NPC_,RACE)
-          if (Pos(' \ Spells \ SPLO - Spell', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-          // * \ ACBS - Configuration \ *
-          // * \ ACBS - Configuration \ Base spell points|Fatigue|Barter gold|Level (offset)|Calc min|Calc max (CREA, NPC_)
-          // * \ ACBS - Configuration \ Flags
-          // TODO: verify ==>
-          if (Pos(' \ ACBS - Configureation \ ', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          // * \ Factions \ SNAM - Faction (CREA, NPC_)
-          // * \ Factions \ SNAM - Faction \ Faction ==> FormID
-          // * \ Factions \ SNAM - Faction \ Rank ==> int
-          // * \ AIDT - AI Data \ * (CREA, NPC_)
-          // * \ AIDT - AI Data \ Aggression|Confidence|Energy Level|Responsibility|Maximum training level
-          // ==> over-ride above
-          // * \ AIDT - AI Data \ Teaches
-          // TODO: verify ==>
-          if (Pos(' \ AIDT - AI Data \ Teaches', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          // * \ AIDT - AI Data \ Buys/Sells and Services
-          // * \ AI Packages \ PKID - AI Package (CREA)
-          if (Pos(' \ AI Packages \ PKID - AI Package', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-          // CREA \ DATA - Creature Data \ *
-          // CREA \ DATA - Creature Data \ Type ==> "Creature?"
-          // CREA \ DATA - Creature Data \ Soul ==> "Common?"
-          // ==> over-ride above
-          // CREA \ DATA - Creature Data \ Combat Skill|Magic Skill|Stealth Skill|Health|Attack Damage|Strength|Intelligence|Willpower|Agility|Speed|Endurance|Personality|Luck
-          // CSTY \ CSTD - Standard \ *
-          // CSTY \ CSAD - Advanced \ *
-          // INFO \ Responses \ *
-          // INFO \ Responses \ TRDT - Response Data \ *
-          // INFO \ Responses \ TRDT - Response Data \ Emotion Type
-          // INFO \ Responses \ TRDT - Response Data \ Emotion Value
-          // INFO \ Responses \ TRDT - Response Data \ Response number
-          // INFO \ Responses \ NAM1 - Response Text => txt
-          // INFO \ Responses \ NAM2 - Actor notes => txt
-          // * \ Conditions \ CTDA - Condition \ * (INFO, IDLE, PACK, QUST)
-          // * \ Conditions \ CTDA - Condition \ Type
-          // * \ Conditions \ CTDA - Condition \ Function
-          // * \ Conditions \ CTDA - Condition \ Parameter #1
-          // * \ Conditions \ CTDA - Condition \ Paramater #2
-          if (Pos(' \ Conditions \ CTDA - Condition \ Function', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          //if (Pos(' \ Conditions \ CTDA - Condition \ Parameter', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
-          // * \ Result Script \ SCHR - Basic Script Data \ * (INFO, QUST\Stages\LogEntries\LogEntry\ResultScript,)
-          // * \ Result Script \ SCHR - Basic Script Data \ Type
-          // * \ Result Script \ SCHR - Basic Script Data \ RefCount|CompiledSize|VariableCount
-          // SCPT \ SCHR - Basic Script Data \ *
-          if (Pos(' \ SCHR - Basic Script Data \ RefCount', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          if (Pos(' \ SCHR - Basic Script Data \ CompiledSize', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          if (Pos(' \ SCHR - Basic Script Data \ VariableCount', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          // over-ride above
-          if (Pos(' \ SCHR - Basic Script Data \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          // INFO \ Result Script \ References \ SCRO - Global Reference
-          // SCPT \ References \ SCRO - Global Reference
-          if (Pos(' \ References \ SCRO - Global Reference', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-          // INFO \ Choices\ TCLT - Choice
-          if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-          // * \ ENIT - ENIT \ * (ALCH,ENCH,INGR)
-          // * \ ENIT - ENIT \ Charge Amount|Enchant Cost
-          // * \ ENIT - ENIT \ Type
-          if (Pos(' \ ENIT - ENIT \ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          // * \ Effects \ Effect \ *
-          if (Pos(' \ Effects \ Effect \ EFID - Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
-          if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
-          if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Magnitude', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Area', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Duration', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-  //        if ( (Pos('EFIT - EFIT \ Type', element_path) <> 0) And (native_type <> 8209) ) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Actor Value', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Script effect', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-          if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Magic school', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Visual effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          // EYES \ DATA - Flags
-          // FACT \ Relations \ XNAM - Relation \ *
-          // FACT \ Relations \ XNAM - Relation \ Faction => formid
-          // FACT \ Relations \ XNAM - Relation \ Modifier => int
-          // FLOR \ PFPC - Seasonal ingredient production \ Spring|Summer|Fall|Winter => int
-          // * \ DATA - DATA \ * (GRAS)
-          // * \ DATA - DATA \ Density|Min Slope|Max Slope
-          // * \ DATA - DATA \ Unit from water amount|Unit from water type
-          // HAIR \ DATA - Flags ?
-          // IDLE \ Data - Related Idle Animations \ * ==> formid
-          // LIGH \ DATA - DATA \ *
-          // LIGH \ DATA - DATA \ Time
-          // LIGH \ DATA - DATA \ Radius
-          // LIGH \ DATA - DATA \ Color \ Red|Green|Blue
-          // LTEX \ HNAM - Havok Data \ *
-          // LTEX \ HNAM - Havok Data \ Material Type
-          // LTEX \ HNAM - Havok Data \ Friction
-          // LTEX \ HNAM - Havok Data \ Restitution
-          // LTEX \ Grasses \ GNAM - Grass ==> formid
-          // * \ Leveled List Entries \ LVLO - Leveled List Entry \ * (LVLC,LVLI)
-          // * \ Leveled List Entries \ LVLO - Leveled List Entry \ Reference ==> formid
-          // * \ Leveled List Entries \ LVLO - Leveled List Entry \ Level|Count
-          // MISC \ DATA - DATA \ *
-          // MISC \ DATA - DATA \ ????
-          // NPC_ \ DATA - Stats \ *
-          // NPC_ \ DATA - Stats \ Armorer|Athletics|Blade|Block|Blunt|Hand to Hand|Heavy Armor|Alchemy|...
-          // NPC_ \ HCLR - Hair color \ *
-          // NPC_ \ HCLR - Hair color \ Red|Green|Blue
-          // * \ FaceGen Data \ * (NPC_, RACE)
-          // * \ FaceGen Data \ FGGS - ...
-          // * \ FaceGen Data \ FGGA - ...
-          // * \ FaceGen Data \ FGTS - ...
-          // PACK \ PKDT - General \ General \ *
-          // PACK \ PKDT - General \ General \ Type
-          // PACK \ PLDT - Location \ *
-          // PACK \ PLDT - Location \ Type
-          // PACK \ PLDT - Location \ Location
-          // PACK \ PLDT - Location \ Radius
-          // PACK \ PSDT - Schedule \ *
-          // PACK \ PSDT - Schedule \ Month|Day of week
-          // PACK \ PSDT - Schedule \ Date
-          // PACK \ PSDT - Schedule \ Time
-          // PACK \ PSDT - Schedule \ Duration
-          // PACK \ PTDT - Target \ *
-          // PACK \ PTDT - Target \ Type
-          // PACK \ PTDT - Target \ Target ==> formid
-          // PACK \ PTDT - Target \ Count ==> int
-          // QUST \ DATA - General \ Priority ==> int
-          if (Pos('QUST \ DATA - General \ Priority', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          // QUST \ Stages \ *
-          // QUST \ Stages \ Stage \ INDX - ...
-          if (Pos('Stage \ INDX - Stage index', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          // QUST \ Stages \ Log Entries \ Log Entry \ *
-          // QUST \ Stages \ Log Entries \ Log Entry \ QSDT - Stage Flags
-          // QUST \ Stages \ Log Entries \ Log Entry \ CNAM - Log Entry ==> text
-          // QUST \ Stages \ Log Entries \ Log Entry \ Result Script \ *
-          // QUST \ Targets \ Target \ *
-          // QUST \ Targets \ Target \ QSTA - Target \ *
-          // QUST \ Targets \ Target \ QSTA - Target \ Target ==> formid
-          // QUST \ Targets \ Target \ Conditions \ CTDA - Condition \ *
-          // RACE \ DATA - DATA \ Skill Boosts \ Skill Boost \ *
-          // RACE \ DATA - DATA \ Skill Boosts \ Skill Boost \ Skill
-          if (Pos('Skill Boost \ Skill', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          // RACE \ DATA - DATA \ Skill Boosts \ Skill Boost \ Boost
-          if (Pos('Skill Boost \ Boost', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          // RACE \ DNAM - Default Hair \ Male|Female ==> formid
-          // RACE \ ATTR - Base Attributes \ Male \ *
-          // RACE \ ATTR - Base Attributes \ Female \ *
-          if (Pos('RACE \ ATTR - Base Attributes \ ', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-          // RACE \ Face Data \ NAM0 - Face Data Marker
-          // RACE \ Face Data \ Parts \ *
-          // RACE \ Face Data \ Parts \ Part \ INDX - ...
-          if (Pos(' \ Face Data \ Parts \ Part \ INDX - Index', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          // RACE \ Face Data \ NAM1 - Body Data Marker
-          // RACE \ Male Body Data \ Parts \ *
-          // RACE \ Female Body Data \ Parts \ *
-          if (Pos(' Body Data \ Parts \ Part \ INDX - Index', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-          // RACE \ HNAM - Hairs \ Hair ==> formid
-          // RACE \ ENAM - Eyes \ Eye ==> formid
-          // REGN \ Region Areas \ Region Area \ *
-          // REGN \ Region Areas \ Region Area \ RPLI - ...
-          // REGN \ Region Areas \ Region Area \ RPLD - ...
-          // REGN \ Region Data Entries \ Region Data Entry \ *
-          // REGN \ Region Data Entries \ Region Data Entry \ RDAT - Data Header \ *
-          // REGN \ Region Data Entries \ Region Data Entry \ RDAT - Data Header \ Type
-          // REGN \ Region Data Entries \ Region Data Entry \ RDAT - Data Header \ Priority
-          // REGN \ Region Data Entries \ Region Data Entry \ RDMD - Music Type
-          // REGN \ Region Data Entries \ Region Data Entry \ RDSD - Sounds
-          // SOUN \ SNDX - Sound Data \ *
-          // SOUN \ SNDX - Sound Data \ Minimum...|Maximum...|Freq..
-          // SOUN \ SNDX - Sound Data \ Static Atten...
-          // SOUN \ SNDX - Sound Data \ Stop time|Start time
-          // SPEL \ SPIT - SPIT \ *
-          // SPEL \ SPIT - SPIT \ Type
-          // SPEL \ SPIT - SPIT \ Cost
-          // SPEL \ SPIT - SPIT \ Level
-          // TREE \ CNAM - Tree Data \ Shadow Radius
-          // WEAP \ DATA - DATA \ Type
-          // WTHR \ NAM0 - Colors by Types/Times \ *
-          // WTHR \ NAM0 - Colors by Types/Times \ Type #*** \ *
-          // WTHR \ NAM0 - Colors by Types/Times \ Type #*** \ Time #*** \ *
-          // WTHR \ NAM0 - Colors by Types/Times \ Type #*** \ Time #*** \ Red|Green|Blue
-          // WTHR \ DATA - DATA \ *
-          // WTHR \ DATA - DATA \ Wind Speed|Cloud Speed *|Trans Delta|Sun Glare|...
-          // WTHR \ Sounds \ SNAM - Sound \ *
-          // WTHR \ Sounds \ SNAM - Sound \ Sound ==> formid
-          // WTHR \ Sounds \ SNAM - Sound \ Type
+//          AddMessage('DEBUG: element_path=' + element_path + ', element_type=' + IntToStr(element_type));
+          element_edit_value := ProcessNonCellRecords(e, element, element_path, native_value, element_edit_value)
+
         end;
 
       end;
 
-//      AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
       json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value + postfix2);
     end
     // if child_count <> 0
@@ -480,7 +494,6 @@ begin
       json_output.append(prefix + prefix2 + type_string + '"' + element_name + '":');
     end;
 
-//    if (Assigned(element_type)) then AddMessage('DEBUG: ElementType: ' + IntToStr(element_type));
     if (child_count > 0) then ProcessSubRecord(element, prefix + prefix2, postfix2);
 
   end;
@@ -731,8 +744,8 @@ begin
   ProcessRecord(e, '', '');
   ForceDirectories(PROGRAMPATH + '\' + element_path);
   json_output.SaveToFile(element_path + element_filename);
-//  json_output.Free;
   json_output.Clear;
+//  json_output.Free;
 
 //  AddMessage('');
 
