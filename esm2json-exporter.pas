@@ -345,12 +345,11 @@ begin
     type_string := '';
     // DEBUGGING
 //  type_string := '[' + IntToStr(element_type) + ']';
-
+    AddMessage('DEBUG: element_path=' + element_path + ', element_type=' + IntToStr(element_type));
 //  if ( (element_type = etValue) or (element_type = etFlag) or (element_type = etSubRecord)) then
     if (child_count = 0) then
     begin
 
-//      AddMessage('DEBUG: element_path=' + element_path);
       if ( (Pos('Unused', element_path) = 0) And (Pos('Unknown', element_path) = 0) ) then
       begin
 
@@ -727,7 +726,7 @@ begin
 
   prefix := '    ';
 
-//  AddMessage('Processing: ' + Name(e));
+  AddMessage('Processing: ' + Name(e));
 
   parent := GetContainer(e);
   element_filename := IntToHex(GetLoadOrderFormID(e),8) + '.json';
