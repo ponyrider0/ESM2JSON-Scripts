@@ -356,7 +356,98 @@ begin
 
         element_edit_value := FormatNativeValue(native_value, element_edit_value);
 
-        // Display as: "EDID:FormID"
+        // MOVE TO SUBRECORD:
+        // Record Header: Signature, Data Size, Record Flags, FormID, Version Control Info
+        if (Pos('Record Header \ Data Size', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        // * \ Model \ *,
+        // * \ ENIT - ENIT \ *
+        if (Pos(' \ ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
+        if (Pos(' \ ENIT - ENIT \ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos(' \ Effects \ Effect \ EFID - Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+        if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+        if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Magnitude', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Area', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Duration', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+//        if ( (Pos('EFIT - EFIT \ Type', element_path) <> 0) And (native_type <> 8209) ) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos(' \ Effects \ Effect \ EFIT - EFIT \ Actor Value', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Script effect', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Magic school', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        if (Pos(' \ Effects \ Effect \ SCIT - Script effect data \ Visual effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        // * \ BMDT - BMDT \ *
+        // * \ XCLL - Lighting \ * (CELL)
+        if (Pos(' \ XCLL - Lighting \ ', element_path) <> 0) then
+        begin
+          // * \ XCLL - Lighting \ *** Ambient OR Directional OR Fog *** Color \ Red Or Green Or Blue
+          if (Pos(' Color \ Red', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+          if (Pos(' Color \ Green', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+          if (Pos(' Color \ Blue', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+          if (Pos(' \ XCLL - Lighting \ Directional Rotation XY', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+          if (Pos(' \ XCLL - Lighting \ Directional Rotation Z', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        end;
+        // REFR \ XTEL - Teleport Destination \ Door
+        if (Pos(' \ XTEL - Teleport Destination \ Door', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        // PGRD \ PGRP - Points \ *
+        // PGRD \ PGRP - Points \ Point #** \ X|Y|Z|Connections
+        if (Pos('PGRP - Points \ Point #', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+//        if (Pos(' \ Connections', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        // PGRD \ PGRR - Point-to-Point Connections \ *
+        // PGRD \ PGRR - Point-to-Point Connections \ Point #** \ Point
+        if (Pos('PGRD \ PGRR - Point-to-Point Connections \ Point #', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        // * \ DATA - DATA \ *
+        if (Pos(' \ DATA - DATA \ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos(' \ DATA - DATA \ Damage', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos(' \ DATA - DATA \ Armor', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        if (Pos(' \ DATA - DATA \ Health', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        // * \ DATA - DATA \ Type
+        if (Pos(' \ DATA - DATA \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        // * \ DATA - DATA \ Teaches (BOOK)
+        if (Pos(' \ DATA - DATA \ Teaches', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        // CLAS \ DATA - DATA \ Primary Attributes \ *
+        if (Pos(' \ DATA - DATA \ Primary Attributes \ ', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+          // CLAS \ DATA - DATA \ Major Skills \ *
+        if (Pos(' \ DATA - DATA \ Major Skill \ ', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+          // CLAS \ DATA - DATA \ Specialization
+        if (Pos(' \ DATA - DATA \ Specialization', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        // CLAS \ DATA - DATA \ Buys/Sells and Services
+        // CLAS \ DATA - DATA \ Teaches
+        // CLAS \ DATA - DATA \ Maximum training level
+
+
+
+
+
+        // ACTI - done
+        // ALCH - done
+        // AMMO - done
+        // ANIO - done
+        // APPA - done
+        // ARMO - done
+        // BOOK - done
+        // CELL - done
+        // ACHR - done
+        // REFR - done
+        // PGRD - done
+        // CLAS - done
+
+
+        // GENERAL
+        // * \ EDID - Editor ID, * \ FULL - Name, * \ SCRI - Script
+        // * \ ENAM - Enchantment, * \ ANAM - Enchantment Points
+        // BOOK \ DESC - Description
+        if (Pos(' \ SCRI - Script', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ ENAM - Enchantment', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        if (Pos(' \ ANAM - Enchantment Points', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+        // * \ DATA - IDLE animation
+        if (Pos(' \ DATA - IDLE animation', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        // * \ XCMT - Music (CELL)
+        if (Pos(' \ XCMT - Music', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+        // * \ Name - Base (ACHR, REFR,)
+        if (Pos('\ NAME - Base', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
+        // PGRD \ Data - Point Count
+        if (Pos(' \ DATA - Point Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+
+
         if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
         if (Pos('QSTI - Quest', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
         if (Pos('AI Packages \ PKID - AI Package', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
@@ -365,45 +456,18 @@ begin
         if (Pos('\ QNAM - Close sound', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
         if (Pos('CNTO - Item \ Item', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
         if (Pos('Weather Type \ Weather', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('\ Door', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('\ NAME - Base', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('SCRI - Script', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('ENAM - Enchantment', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('DATA - IDLE animation', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
 
-        if (Pos('ANAM - Enchantment Points', element_path) <> 0) then element_edit_value := IntToStr(native_value);
         if (Pos('Weather Type \ Chance', element_path) <> 0) then element_edit_value := IntToStr(native_value);
         if (Pos('CNTO - Item \ Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
 
-        if ( (Pos('EFIT - EFIT \ Type', element_path) <> 0) And (native_type <> 8209) ) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
 
         if (CompareText('CELL \ DATA - Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
 
-        if (Pos('\ Value', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos('Data Size', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos('\ Damage', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos('\ Armor', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos('\ Health', element_path) <> 0) then element_edit_value := IntToStr(native_value);
 
-        if (Pos('EFID - Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
-        if (Pos('Magic effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
-        if (CompareText('ENIT - ENIT \ Flags', element_path) = 0) then element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
-        if (Pos('EFIT - EFIT \ Magnitude', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos('EFIT - EFIT \ Area', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos('EFIT - EFIT \ Duration', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-  //      if (Pos('EFIT - EFIT \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-        if (Pos('EFIT - EFIT \ Actor Value', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-        if (Pos('SCIT - Script effect data \ Script effect', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
-        if (Pos('SCIT - Script effect data \ Magic school', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-        if (Pos('SCIT - Script effect data \ Visual effect name', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
 
         if (Pos('INFO \ Conditions \ CTDA - Condition \ Function', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
         //if (Pos('INFO \ Conditions \ CTDA - Condition \ Parameter', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
 
-        if (Pos('Primary Attribute', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-        if (Pos('Major Skill', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-        if (Pos('Specialization', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-        if (Pos('Teaches', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
 
         if (Pos('Skill Boost \ Skill', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
         if (Pos('Skill Boost \ Boost', element_path) <> 0) then element_edit_value := IntToStr(native_value);
@@ -419,16 +483,7 @@ begin
         if (Pos('SCHR - Basic Script Data \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
         if (Pos('SCRO - Global Reference', element_path) <> 0) then element_edit_value := GetFormIDLabel(e, native_value);
 
-        if (Pos(' \ DATA - Point Count', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos(' \ Connections', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos('PGRP - Points \ Point ', element_path) <> 0) then element_edit_value := IntToStr(native_value);
 
-        if (Pos(' Color \ Red', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos(' Color \ Green', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos(' Color \ Blue', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos('\ XCMT - Music', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
-        if (Pos('XCLL - Lighting \ Directional Rotation XY', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        if (Pos('XCLL - Lighting \ Directional Rotation Z', element_path) <> 0) then element_edit_value := IntToStr(native_value);
       end;
 
 //      AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
