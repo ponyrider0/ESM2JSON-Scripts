@@ -617,7 +617,8 @@ begin
     element_path := Path(element);
     child_count := ElementCount(element);
     element_type := ElementType(element);
-    element_edit_value := '"' + GetEditValue(element) + '"';
+//    element_edit_value := '"' + GetEditValue(element) + '"';
+    element_edit_value := '';
     native_value := GetNativeValue(element);
     native_type := VarType(native_value);
 
@@ -710,7 +711,8 @@ begin
     element_path := Path(element);
     child_count := ElementCount(element);
     element_type := ElementType(element);
-    element_edit_value := '"' + GetEditValue(element) + '"';
+//    element_edit_value := '"' + GetEditValue(element) + '"';
+    element_edit_value := '';
     native_value := GetNativeValue(element);
     native_type := VarType(native_value);
 
