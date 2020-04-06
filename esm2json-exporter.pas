@@ -597,12 +597,10 @@ begin
   parent_type := ElementType(e);
   if ((parent_type = etArray) Or (parent_type = etSubRecordArray)) then
   begin
-//    json_output.append(prefix + '[');
     stringlist_length := json_output.Count;
     json_output[stringlist_length-1] := json_output[stringlist_length-1] + '[';
   end
   else begin
-//    json_output.append(prefix + '{');
     stringlist_length := json_output.Count;
     json_output[stringlist_length-1] := json_output[stringlist_length-1] + '{';
   end;
@@ -745,7 +743,7 @@ begin
 
     type_string := '';
     // DEBUGGING
-  type_string := '[' + IntToStr(element_type) + ']';
+//  type_string := '[' + IntToStr(element_type) + ']';
 //    AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
 //    AddMessage('DEBUG: element_path=' + element_path + ', element_type=' + IntToStr(element_type));
 //  if ( (element_type = etValue) or (element_type = etFlag) or (element_type = etSubRecord)) then
@@ -1238,9 +1236,7 @@ end;
 function Process(e: IInterface): integer;
 var
   element, parent: IInterface;
-  string_offset, element_count, element_index, child_count: integer;
-  element_filename, element_path, element_edit_value, prefix: string;
-  sig, x_string, parent_path, parent_basename: string;
+  element_filename, file_path, element_edit_value, prefix: string;
   parent_type: TwbElementType;
 begin
   Result := 0;
