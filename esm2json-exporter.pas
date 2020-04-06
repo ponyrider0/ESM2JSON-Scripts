@@ -109,6 +109,115 @@ begin
 end;
 
 
+function ComposeFilePath(e:IInterface): string;
+var
+  file_path, parent_path, parent_basename: string;
+  x_string: string;
+  string_offset: integer;
+  parent: IInterface;
+  parent_type: TwbElementType;
+begin
+
+  parent := GetContainer(e);
+  while (Assigned(parent)) do
+    begin
+      parent_type := ElementType(parent);
+      parent_basename := BaseName(parent);
+//      AddMessage('DEBUG: Container: [' + BaseName(parent) + ']: Type:'  + IntToStr(parent_type) );
+      if (parent_type = etGroupRecord) then
+      begin
+        // 1. If basename starts with 'GRUP Cell ...'
+        parent_path := parent_basename;
+        if (Pos('GRUP Topic Children',parent_basename) = 1) then
+        begin
+          string_offset := Pos('[DIAL:', parent_basename) + 6;
+          parent_path := copy(parent_basename, string_offset, 8);
+        end
+        else if (Pos('GRUP Cell',parent_basename) = 1) then
+        begin
+          // 2. Then If '...Children of [' Then record CELL:<FormID>
+          if (Pos('GRUP Cell Children',parent_basename) = 1) then
+          begin
+            // Cell FORMID
+            string_offset := Pos('[CELL:', parent_basename) + 6;
+            parent_path := copy(parent_basename, string_offset, 8);
+//            parent_path := IntToHex(GetLoadOrderFormID(e),8);
+          end
+          // 3. Else If '...Persistent Children' Then record 'Persistent'
+          else if (Pos('GRUP Cell Persistent',parent_basename) = 1) then
+          begin
+            parent_path := 'Persistent';
+          end
+          // 4. Else If '...Temporary...' Then ...
+          else if (Pos('GRUP Cell Temporary',parent_basename) = 1) then
+          begin
+            parent_path := 'Temporary';
+          end
+          // 5. Else If '...Visible...' Then ...
+          else if (Pos('GRUP Cell Visible',parent_basename) = 1) then
+          begin
+            parent_path := 'Visible When Distant';
+          end;
+        end
+        // 6. Else if starts with 'GRUP Interior Cell ' ...
+        else if (Pos('GRUP Interior Cell',parent_basename) = 1) then
+        begin
+          if (Pos('GRUP Interior Cell Sub-Block',parent_basename) = 1) then
+          begin
+            string_offset := Length(parent_basename);
+            x_string := copy(parent_basename, 29, string_offset);
+            parent_path := 'Sub-Block ' + x_string;
+          end
+          else if (Pos('GRUP Interior Cell Block',parent_basename) = 1) then
+          begin
+            string_offset := Length(parent_basename);
+            x_string := copy(parent_basename, 25, string_offset);
+            parent_path := 'Block ' + x_string
+          end;
+        end
+        // 7. Else if starts with 'GRUP Exterior Cell ' ...
+        else if (Pos('GRUP Exterior Cell',parent_basename) = 1) then
+        begin
+          if (Pos('GRUP Exterior Cell Sub-Block',parent_basename) = 1) then
+          begin
+            string_offset := Length(parent_basename);
+            x_string := copy(parent_basename, 29, string_offset);
+            parent_path := 'Sub-Block ' + x_string;
+          end
+          else if (Pos('GRUP Exterior Cell Block',parent_basename) = 1) then
+          begin
+            string_offset := Length(parent_basename);
+            x_string := copy(parent_basename, 25, string_offset);
+            parent_path := 'Block ' + x_string
+          end;
+        end
+        // 8. Else if starts with 'GRUP World Children ' ...
+        else if (Pos('GRUP World Children',parent_basename) = 1) then
+        begin
+            // worldspace FORMID
+            string_offset := Pos('[WRLD:', parent_basename) + 6;
+            parent_path := copy(parent_basename, string_offset, 8);
+        end
+        // 9. Else if starts with 'GRUP Top "' ...
+        else if (Pos('GRUP Top ',parent_basename) = 1) then
+        begin
+          parent_path := copy(parent_basename, 11, 4);
+        end;
+      end
+      // Not GroupRecord
+      else if (parent_type = etFile) then
+      begin
+        parent_path := parent_basename;
+      end;
+      file_path := parent_path + '\' + file_path;
+      parent := GetContainer(parent);
+    end;
+
+    Result := file_path;
+
+end;
+
+
 function IsReference(e: IInterface): boolean;
 var
   sig: string;
