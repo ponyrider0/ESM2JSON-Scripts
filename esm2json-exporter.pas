@@ -1257,8 +1257,8 @@ begin
   if (json_filecount mod 100 = 0) then AddMessage('INFO: ' + IntToStr(json_filecount) + ' files written...');
 //  json_output := TStringList.Create;
   ProcessRecord(e, '', '');
-  ForceDirectories(PROGRAMPATH + '\' + element_path);
-  json_output.SaveToFile(element_path + element_filename);
+  ForceDirectories(PROGRAMPATH + '\' + file_path);
+  json_output.SaveToFile(PROGRAMPATH + '\' + file_path + element_filename);
   json_output.Clear;
 //  json_output.Free;
 
