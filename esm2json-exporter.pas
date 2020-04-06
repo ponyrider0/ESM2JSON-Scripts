@@ -671,7 +671,33 @@ begin
       begin
         json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ');
       end;
-      ProcessSubRecord(element, prefix + prefix2, postfix2);
+
+      if (Pos('PGRD \ PGRP - Points \ Point #', element_path) = 1) then
+      begin
+
+      end
+      else if (Pos('PGRD \ PGRR - Point-to-Point Connections \ Point #', element_path) = 1) then
+      begin
+
+      end
+      else if (Pos('PGRD \ PGRI - Inter-Cell Connections \ Inter-Cell Connection', element_path) = 1) then
+      begin
+
+      end
+      else if (Pos('LAND \ Layers \ Base Layer', element_path) = 1) then
+      begin
+
+      end
+      else if (Pos('LAND \ Layers \ Alpha Layer', element_path) = 1) then
+      begin
+
+      end
+      else
+      begin
+//          AddMessage('DEBUG: Skipping subrecord processing: element_path=' + element_path + ', element_type=' + IntToStr(element_type));
+        ProcessSubRecord(element, prefix + prefix2, postfix2);
+      end;
+
     end;
 
   end;
