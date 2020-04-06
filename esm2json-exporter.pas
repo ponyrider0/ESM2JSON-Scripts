@@ -822,6 +822,10 @@ begin
     else
       element_edit_value := false;
   end
+  else if (native_type = 16) then
+  begin
+    element_edit_value := IntToStr(native_value);
+  end
   else if (native_type = 17) then
   begin
     element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
