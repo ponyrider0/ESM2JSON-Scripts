@@ -7,6 +7,7 @@ var
   json_output: TStringList;
   json_filecount: integer;
   target_mod_file: IwbFile;
+  temp_val: integer;
 
 // Called before processing
 // You can remove it if script doesn't require initialization code
