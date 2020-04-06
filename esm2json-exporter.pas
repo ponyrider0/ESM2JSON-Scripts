@@ -275,6 +275,7 @@ end;
 function FormatNativeValue(native_value: Variant; element_edit_value: string = ''): string;
 var
   native_type: integer;
+  i, array_count: integer;
 begin
 
   native_type := VarType(native_value);
@@ -286,6 +287,16 @@ begin
     element_edit_value := StringReplace(element_edit_value, #13#10, '\r\n', [rfReplaceAll]);
     element_edit_value := StringReplace(element_edit_value, #10, '\n', [rfReplaceAll]);
     element_edit_value := '"' + element_edit_value + '"'
+  end
+  else if (native_type = 8209) then
+  begin
+    array_count := Length(native_value)-1;
+    for i := 0 to array_count do
+    begin
+      element_edit_value :=  element_edit_value + IntToHex(native_value[0],2);
+      if (i <> array_count) then element_edit_value := element_edit_value + ' ';
+    end;
+    element_edit_value := '"' + element_edit_value + '"';
   end
   else if (native_type = varDouble) then
   begin
