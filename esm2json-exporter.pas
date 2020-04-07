@@ -375,8 +375,48 @@ begin
 end;
 
 
+function ProcessDialogRecords(element: IInterface; element_path:string; native_value: Variant; element_edit_value:string ): string;
+begin
+  // INFO \ Responses \ *
+  // INFO \ Responses \ TRDT - Response Data \ *
+  // INFO \ Responses \ TRDT - Response Data \ Emotion Type
+  // INFO \ Responses \ TRDT - Response Data \ Emotion Value
+  // INFO \ Responses \ TRDT - Response Data \ Response number
+  // INFO \ Responses \ NAM1 - Response Text => txt
+  // INFO \ Responses \ NAM2 - Actor notes => txt
+  if (Pos(' \Responses \ TRDT - Response Data \ Emotion Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"'
+  else if (Pos(' \Responses \ TRDT - Response Data \ Response number', element_path) <> 0) then element_edit_value := IntToStr(native_value)
+  // * \ Conditions \ CTDA - Condition \ * (INFO, IDLE, PACK, QUST)
+  // * \ Conditions \ CTDA - Condition \ Type
+  // * \ Conditions \ CTDA - Condition \ Function
+  // * \ Conditions \ CTDA - Condition \ Parameter #1
+  // * \ Conditions \ CTDA - Condition \ Paramater #2
+  else if (Pos(' \ Conditions \ CTDA - Condition \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"'
+  else if (Pos(' \ Conditions \ CTDA - Condition \ Function', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"'
+  else if (Pos(' \ Conditions \ CTDA - Condition \ Parameter #', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"'
+  //if (Pos(' \ Conditions \ CTDA - Condition \ Parameter', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
+  // * \ Result Script \ SCHR - Basic Script Data \ * (INFO, QUST\Stages\LogEntries\LogEntry\ResultScript,)
+  // * \ Result Script \ SCHR - Basic Script Data \ Type
+  // * \ Result Script \ SCHR - Basic Script Data \ RefCount|CompiledSize|VariableCount
+  // SCPT \ SCHR - Basic Script Data \ *
+  else if (Pos(' \ SCHR - Basic Script Data \ RefCount', element_path) <> 0) then element_edit_value := IntToStr(native_value)
+  else if (Pos(' \ SCHR - Basic Script Data \ CompiledSize', element_path) <> 0) then element_edit_value := IntToStr(native_value)
+  else if (Pos(' \ SCHR - Basic Script Data \ VariableCount', element_path) <> 0) then element_edit_value := IntToStr(native_value)
+  // over-ride above
+  else if (Pos(' \ SCHR - Basic Script Data \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"'
+  // INFO \ Result Script \ References \ SCRO - Global Reference
+  // SCPT \ References \ SCRO - Global Reference
+  else if (Pos(' \ References \ SCRO - Global Reference', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value)
+  // INFO \ Choices\ TCLT - Choice
+  else if (Pos('INFO \ Choices \ TCLT - Choice', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value)
+  else if (Pos(' \ QSTI - Quest', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
 
-function ProcessNonCellRecords(element: IInterface; element_path:string; native_value: Variant; element_edit_value:string ): string;
+  Result := element_edit_value;
+
+end;
+
+
+function ProcessOtherRecords(element: IInterface; element_path:string; native_value: Variant; element_edit_value:string ): string;
 begin
 
   // * \ DATA - DATA \ *
@@ -652,9 +692,13 @@ begin
         begin
           element_edit_value := ProcessCellRecords(element_path, native_value, element_edit_value);
         end
+        else if ( (Pos('DIAL', element_path) <> 0) Or (Pos('INFO', element_path) <> 0) ) then
+        begin
+          element_edit_value := ProcessDialogRecords(element, element_path, native_value, element_edit_value);
+        end
         else
         begin
-          element_edit_value := ProcessNonCellRecords(element, element_path, native_value, element_edit_value)
+          element_edit_value := ProcessOtherRecords(element, element_path, native_value, element_edit_value);
         end;
         if (element_edit_value = '') then element_edit_value := FormatNativeValue(native_value, element_edit_value);
 
