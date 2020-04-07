@@ -291,13 +291,8 @@ begin
   end
   else if (native_type = 8209) then
   begin
-    array_count := Length(native_value)-1;
-    for i := 0 to array_count do
-    begin
-      element_edit_value :=  element_edit_value + IntToHex(native_value[0],2);
-      if (i <> array_count) then element_edit_value := element_edit_value + ' ';
-    end;
-    element_edit_value := '"' + element_edit_value + '"';
+    AddMessage('ERROR: FormatNativeValue() byte array type detected.')
+    element_edit_value := '""';
   end
   else if (native_type = varDouble) then
   begin
@@ -630,9 +625,10 @@ begin
     if (child_count = 0) then
     begin
 
-      if ( (Pos('Unused', element_path) = 0) And (Pos('Unknown', element_path) = 0) ) then
+      if (native_type = 8209) then
+        element_edit_value := '"' + GetEditValue(element) + '"'
+      else
       begin
-
         element_edit_value := FormatNativeValue(native_value, element_edit_value);
 
         // Record Header: Signature, Data Size, Record Flags, FormID, Version Control Info
@@ -724,9 +720,10 @@ begin
     if (child_count = 0) then
     begin
 
-      if ( (Pos('Unused', element_path) = 0) And (Pos('Unknown', element_path) = 0) ) then
+      if (native_type = 8209) then
+        element_edit_value := '"' + GetEditValue(element) + '"'
+      else
       begin
-
         element_edit_value := FormatNativeValue(native_value, element_edit_value);
 
         // GENERAL
