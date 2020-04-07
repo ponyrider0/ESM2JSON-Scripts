@@ -268,7 +268,7 @@ begin
     //   name_string := 'BASE(' + EditorID(base_record) + ')';
     // end;
   end;
-  Result := '"' + name_string + ':' + IntToHex(formid, 8) + 'H"';
+  Result := '"' + name_string + ':' + IntToHex(formid, 8) + '"';
 
 end;
 
