@@ -325,7 +325,7 @@ begin
   end
   else if (native_type = varWord) then
   begin
-    element_edit_value := '"' + IntToHex(native_value, 4) + 'H"';
+    element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
   end
   else if (native_type = varByte) then
   begin
