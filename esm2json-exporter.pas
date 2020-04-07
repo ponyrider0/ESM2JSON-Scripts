@@ -631,7 +631,7 @@ begin
 
     type_string := '';
     // DEBUGGING
-    type_string := '[' + IntToStr(element_type) + ']';
+//    type_string := '[' + IntToStr(element_type) + ']';
 //    AddMessage('DEBUG: VarType=' + VarToStr(VarType(native_value)));
 //    AddMessage('DEBUG: element_path=' + element_path + ', element_type=' + IntToStr(element_type));
 //  if ( (element_type = etValue) or (element_type = etFlag) or (element_type = etSubRecord)) then
@@ -788,12 +788,12 @@ begin
 
       end;
 
-      json_output.append(prefix + prefix2 + type_string + '"' + element_path + '": ' + element_edit_value + postfix2);
+      json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ' + element_edit_value + postfix2);
     end
     // if child_count <> 0
     else
     begin
-      json_output.append(prefix + prefix2 + type_string + '"' + element_path + '": ');
+      json_output.append(prefix + prefix2 + type_string + '"' + element_name + '": ');
       ProcessSubRecord(element, prefix + prefix2, postfix2);
     end;
 
