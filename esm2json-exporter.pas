@@ -781,6 +781,10 @@ begin
         // * \ EDID - Editor ID, * \ FULL - Name, * \ SCRI - Script
         // * \ ENAM - Enchantment, * \ ANAM - Enchantment Points
         // BOOK \ DESC - Description
+        if (Pos(' \ Topic', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
+        if (Pos(' \ Cell', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
+        if (Pos(' \ Worldspace', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
+
         if (Pos(' \ SCRI - Script', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         if (Pos(' \ ENAM - Enchantment', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
         if (Pos(' \ ANAM - Enchantment Points', element_path) <> 0) then element_edit_value := IntToStr(native_value);
