@@ -250,7 +250,7 @@ end;
 
 function GetFormIDLabel(formid: Cardinal): string;
 var
-  name_string: string;
+  name_string, sig_string: string;
   base_formID: Cardinal;
   base_record, target_record: IInterface;
 begin
