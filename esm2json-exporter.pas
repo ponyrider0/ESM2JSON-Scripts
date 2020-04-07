@@ -256,10 +256,12 @@ var
 begin
 
   target_record := RecordByFormID(target_mod_file, formid, True);
-  name_string := EditorID(target_record);
-  if ( (name_string = '') And (IsReference(target_record)) ) then
+  name_string := EditorID(target_record) + ' ';
+  name_string := StringReplace(name_string,'"','\"', [rfReplaceAll]);
+  sig_string := Signature(target_record);
+  if ( (name_string = ' ') And (IsReference(target_record)) ) then
   begin
-    name_string := '(' + Signature(target_record) + ')';
+    name_string := '';
     // base_formID := GetElementNativeValues(target_record, 'Name - Base');
     // AddMessage('DEBUG: base_formID=' + IntToHex(base_formID, 8));
     // base_record := RecordByFormID(GetFile(e), base_formID, True);
@@ -268,7 +270,7 @@ begin
     //   name_string := 'BASE(' + EditorID(base_record) + ')';
     // end;
   end;
-  Result := '"' + name_string + ':' + IntToHex(formid, 8) + '"';
+  Result := '"' + name_string + '[' + sig_string + ':' + IntToHex(formid, 8) + ']"';
 
 end;
 
