@@ -1153,7 +1153,10 @@ begin
     end
     else
     begin
-      element_edit_value := FormatNativeValue2(native_value);
+      if (native_type <> 8209) then
+        element_edit_value := FormatNativeValue2(native_value)
+      else
+        element_edit_value := '"' + GetEditValue(element) + '"';
     end;
 
 //    index_string := '[' + IntToStr(element_index) + ']';
