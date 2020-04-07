@@ -472,13 +472,6 @@ begin
   // CREA \ DATA - Creature Data \ Combat Skill|Magic Skill|Stealth Skill|Health|Attack Damage|Strength|Intelligence|Willpower|Agility|Speed|Endurance|Personality|Luck
   // CSTY \ CSTD - Standard \ *
   // CSTY \ CSAD - Advanced \ *
-  // INFO \ Responses \ *
-  // INFO \ Responses \ TRDT - Response Data \ *
-  // INFO \ Responses \ TRDT - Response Data \ Emotion Type
-  // INFO \ Responses \ TRDT - Response Data \ Emotion Value
-  // INFO \ Responses \ TRDT - Response Data \ Response number
-  // INFO \ Responses \ NAM1 - Response Text => txt
-  // INFO \ Responses \ NAM2 - Actor notes => txt
   // * \ Conditions \ CTDA - Condition \ * (INFO, IDLE, PACK, QUST)
   // * \ Conditions \ CTDA - Condition \ Type
   // * \ Conditions \ CTDA - Condition \ Function
