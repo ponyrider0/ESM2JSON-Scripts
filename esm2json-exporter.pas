@@ -818,7 +818,7 @@ begin
         // REGN \ WNAM - Worldspace ==> formid
         // SLGM \ SOUL - Contained Soul
         // SLGM \ SLGM - Maximum Capacity
-        if (element_edit_value = '') then element_edit_value := FormatNativeValue(native_value, element_edit_value);        
+        if (element_edit_value = '') then element_edit_value := FormatNativeValue(native_value, element_edit_value);
 
         element_edit_value := ReplaceEmptyFlagsString(element_path, native_value, element_edit_value);
         if ((element_type = etArray) Or (element_type = etSubRecordArray)) then element_edit_value := '[]';
