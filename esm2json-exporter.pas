@@ -353,10 +353,10 @@ begin
   // PGRD \ PGRP - Points \ *
   // PGRD \ PGRP - Points \ Point #** \ X|Y|Z|Connections
   if (Pos(' \ PGRP - Points \ Point #', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-//        if (Pos(' \ Connections', element_path) <> 0) then element_edit_value := IntToStr(native_value);
   // PGRD \ PGRR - Point-to-Point Connections \ *
   // PGRD \ PGRR - Point-to-Point Connections \ Point #** \ Point
   if (Pos('PGRD \ PGRR - Point-to-Point Connections \ Point #', element_path) <> 0) then element_edit_value := IntToStr(native_value);
+  if (Pos('PGRD \ PGRI - Inter-Cell Connections \ Inter-Cell Connection \ Point', element_path) <> 0) then element_edit_value := IntToStr(native_value);
   // WRLD \ MNAM - Map Data \ *
   // WRLD \ MNAM - Map Data \ Usable Dimensions \ X|Y
   // WRLD \ MNAM - Map Data \ Cell Coordinates \ ** NW|SE ** Cell \ X|Y
