@@ -132,7 +132,7 @@ begin
         if (Pos('GRUP Topic Children',parent_basename) = 1) then
         begin
           string_offset := Pos('[DIAL:', parent_basename) + 6;
-          parent_path := copy(parent_basename, string_offset, 8);
+          parent_path := copy(parent_basename, string_offset, 8) + '\Child Group';
         end
         else if (Pos('GRUP Cell',parent_basename) = 1) then
         begin
@@ -321,15 +321,15 @@ begin
   end
   else if (native_type = varLongWord) then
   begin
-    element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
+    element_edit_value := '"' + IntToHex(native_value, 8) + '"';
   end
   else if (native_type = varWord) then
   begin
-    element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
+    element_edit_value := '"' + IntToHex(native_value, 8) + '"';
   end
   else if (native_type = varByte) then
   begin
-    element_edit_value := '"' + IntToHex(native_value, 2) + 'H"';
+    element_edit_value := '"' + IntToHex(native_value, 2) + '"';
   end;
 
   Result := element_edit_value;
@@ -652,7 +652,7 @@ begin
   for element_index := 0 to element_count-1 do
   begin
     postfix2 := '';
-    if (element_index <> element_count-1) then postfix2 := ',';
+    if (element_index <> element_count-1) then postfix2 := ', ';
 
     element := ElementByIndex(e, element_index);
     element_name := Name(element);
@@ -750,7 +750,7 @@ begin
   for element_index := 0 to element_count-1 do
   begin
     postfix2 := '';
-    if (element_index <> element_count-1) then postfix2 := ',';
+    if (element_index <> element_count-1) then postfix2 := ', ';
 
     element := ElementByIndex(e, element_index);
     element_name := Name(element);
@@ -929,7 +929,7 @@ begin
   element_count := ElementCount(e);
   for element_index := 0 to element_count-1 do
   begin
-    if (element_index = element_count-1) then postfix2 := '' else postfix2 := ',' ;
+    if (element_index = element_count-1) then postfix2 := '' else postfix2 := ', ' ;
     postfix3 := '';
     child_count := 0;
     element_edit_value := '';
@@ -1009,7 +1009,7 @@ begin
   element_count := ElementCount(e);
   for element_index := 0 to element_count-1 do
   begin
-    if (element_index = element_count-1) then postfix2 := '' else postfix2 := ',' ;
+    if (element_index = element_count-1) then postfix2 := '' else postfix2 := ', ' ;
     postfix3 := '';
     child_count := 0;
     element_edit_value := '';
@@ -1089,7 +1089,7 @@ begin
   element_count := ElementCount(e);
   for element_index := 0 to element_count-1 do
   begin
-    if (element_index = element_count-1) then postfix2 := '' else postfix2 := ',' ;
+    if (element_index = element_count-1) then postfix2 := '' else postfix2 := ', ' ;
     postfix3 := '';
     child_count := 0;
     element_edit_value := '';
@@ -1169,7 +1169,7 @@ begin
   element_count := ElementCount(e);
   for element_index := 0 to element_count-1 do
   begin
-    if (element_index = element_count-1) then postfix2 := '' else postfix2 := ',' ;
+    if (element_index = element_count-1) then postfix2 := '' else postfix2 := ', ' ;
     postfix3 := '';
     child_count := 0;
     element_edit_value := '';
