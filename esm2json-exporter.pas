@@ -642,22 +642,21 @@ begin
         element_edit_value := '"' + GetEditValue(element) + '"'
       else
       begin
-        element_edit_value := FormatNativeValue(native_value, element_edit_value);
-
         // Record Header: Signature, Data Size, Record Flags, FormID, Version Control Info
-        if (Pos(' \ Record Header \ Data Size', element_path) <> 0) then element_edit_value := IntToStr(native_value);
-        // * \ Model \ *,
-        // * \ BMDT - BMDT \ *
-
-        if ( (Pos('CELL', element_path) <> 0) Or (Pos('PGRD', element_path) <> 0) Or (Pos('LAND', element_path) <> 0)
+        if (Pos(' \ Record Header \ Data Size', element_path) <> 0) then
+        begin
+          element_edit_value := IntToStr(native_value)
+        end
+        else if ( (Pos('CELL', element_path) <> 0) Or (Pos('PGRD', element_path) <> 0) Or (Pos('LAND', element_path) <> 0)
           Or (Pos('REFR', element_path) <> 0) Or (Pos('ACHR', element_path) <> 0) Or (Pos('ACRE', element_path) <> 0) ) then
         begin
-          element_edit_value := ProcessCellRecords(element_path, native_value, element_edit_value)
+          element_edit_value := ProcessCellRecords(element_path, native_value, element_edit_value);
         end
         else
         begin
           element_edit_value := ProcessNonCellRecords(element, element_path, native_value, element_edit_value)
         end;
+        if (element_edit_value = '') then element_edit_value := FormatNativeValue(native_value, element_edit_value);
 
         element_edit_value := ReplaceEmptyFlagsString(element_path, native_value, element_edit_value);
         if ((element_type = etArray) Or (element_type = etSubRecordArray)) then element_edit_value := '[]';
@@ -737,8 +736,6 @@ begin
         element_edit_value := '"' + GetEditValue(element) + '"'
       else
       begin
-        element_edit_value := FormatNativeValue(native_value, element_edit_value);
-
         // GENERAL
         // * \ EDID - Editor ID, * \ FULL - Name, * \ SCRI - Script
         // * \ ENAM - Enchantment, * \ ANAM - Enchantment Points
@@ -782,6 +779,7 @@ begin
         // REGN \ WNAM - Worldspace ==> formid
         // SLGM \ SOUL - Contained Soul
         // SLGM \ SLGM - Maximum Capacity
+        if (element_edit_value = '') then element_edit_value := FormatNativeValue(native_value, element_edit_value);        
 
         element_edit_value := ReplaceEmptyFlagsString(element_path, native_value, element_edit_value);
         if ((element_type = etArray) Or (element_type = etSubRecordArray)) then element_edit_value := '[]';
