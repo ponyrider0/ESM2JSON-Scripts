@@ -323,15 +323,15 @@ begin
   end
   else if (native_type = varLongWord) then
   begin
-    element_edit_value := '"0x' + IntToHex(native_value, 8) + '"';
+    element_edit_value := '"' + IntToHex(native_value, 8) + '"';
   end
   else if (native_type = varWord) then
   begin
-    element_edit_value := '"0x' + IntToHex(native_value, 8) + '"';
+    element_edit_value := '"' + IntToHex(native_value, 8) + '"';
   end
   else if (native_type = varByte) then
   begin
-    element_edit_value := '"0x' + IntToHex(native_value, 2) + '"';
+    element_edit_value := '"' + IntToHex(native_value, 2) + '"';
   end;
 
   Result := element_edit_value;
