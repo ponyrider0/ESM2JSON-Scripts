@@ -484,7 +484,9 @@ begin
   // * \ Conditions \ CTDA - Condition \ Function
   // * \ Conditions \ CTDA - Condition \ Parameter #1
   // * \ Conditions \ CTDA - Condition \ Paramater #2
+  if (Pos(' \ Conditions \ CTDA - Condition \ Type', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
   if (Pos(' \ Conditions \ CTDA - Condition \ Function', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
+  if (Pos(' \ Conditions \ CTDA - Condition \ Parameter #', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + ':' + IntToStr(native_value) + '"';
   //if (Pos(' \ Conditions \ CTDA - Condition \ Parameter', element_path) <> 0) then element_edit_value := '"' + GetEditValue(element) + '"';
   // * \ Result Script \ SCHR - Basic Script Data \ * (INFO, QUST\Stages\LogEntries\LogEntry\ResultScript,)
   // * \ Result Script \ SCHR - Basic Script Data \ Type
