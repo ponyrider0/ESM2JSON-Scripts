@@ -353,6 +353,7 @@ begin
   // LAND \ Layers \ *
   // LAND \ Layers \ *** Base|Alpha *** Layer \ *** BTXT|ATXT *** ... \ *
   // LAND \ Layers \ *** Base|Alpha *** Layer \ *** BTXT|ATXT *** ... \ Texture ==> formid
+  if (Pos(' Layer Header \ Texture', element_path) <> 0) then element_edit_value := GetFormIDLabel(native_value);
   // LAND \ Layers \ *** Base|Alpha *** Layer \ *** BTXT|ATXT *** ... \ Quadrant
   // LAND \ Layers \ *** Base|Alpha *** Layer \ *** BTXT|ATXT *** ... \ Layer
   // LAND \ Layers \ *** Base|Alpha *** Layer \ VTXT ...
