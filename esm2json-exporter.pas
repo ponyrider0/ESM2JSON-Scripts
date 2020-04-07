@@ -307,6 +307,18 @@ begin
       element_edit_value := 'false';
     end;
   end
+  else if (native_type = varInteger) then
+  begin
+    element_edit_value := IntToStr(native_value);;
+  end
+  else if (native_type = varSmallint) then
+  begin
+    element_edit_value := IntToStr(native_value);;
+  end
+  else if (native_type = varShortInt) then
+  begin
+    element_edit_value := IntToStr(native_value);;
+  end
   else if (native_type = varLongWord) then
   begin
     element_edit_value := '"' + IntToHex(native_value, 8) + 'H"';
