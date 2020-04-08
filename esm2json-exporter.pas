@@ -132,7 +132,8 @@ begin
         if (Pos('GRUP Topic Children',parent_basename) = 1) then
         begin
           string_offset := Pos('[DIAL:', parent_basename) + 6;
-          parent_path := copy(parent_basename, string_offset, 8) + '\Child Group';
+          parent_path := copy(parent_basename, string_offset, 8);
+//          parent_path := copy(parent_basename, string_offset, 8) + '\Child Group';
         end
         else if (Pos('GRUP Cell',parent_basename) = 1) then
         begin
