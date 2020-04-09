@@ -50,7 +50,7 @@ for line in result_lines:
         commit_message = commit_title + ": " + commit_message
 #        print "DEBUG: git commit -m \"" + commit_message + "\""
         subprocess.call([git_exe, "commit", "-m", commit_message])
-        raw_input("Press ENTER to continue.")
+#        raw_input("Press ENTER to continue.")
     else:
         print "ERROR: parsing output on line[" + str(i) + "]: " + line
     i += 1
