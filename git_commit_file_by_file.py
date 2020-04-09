@@ -23,7 +23,7 @@ for line in result_lines:
         operator=line[0:2]
         files=line[3:].split("\0")
 #        print "DEBUG: operator=\"" + operator + "\""
-        print "DEBUG: file=\"" + files[0] + "\""
+#        print "DEBUG: file=\"" + files[0] + "\""
 #        if len(files) > 1:
 #            print "DEBUG: orig_file=" +files[1]
         if operator[0] != ' ' and operator[0] != '?':
